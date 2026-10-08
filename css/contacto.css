@@ -7,7 +7,6 @@
 .ct-facts .fact { align-items: start; }
 .ct-facts .fact > span:last-child { min-width: 0; }
 .ct-facts .fact-value { overflow-wrap: anywhere; }
-.ct-facts .fact:nth-child(4) .fact-ico { background: var(--azul-50); color: var(--azul); }
 .ct-facts .social { margin-top: var(--s-2); }
 
 .ct-form-title { font-size: var(--fs-h3); margin-bottom: var(--s-5); color: var(--azul); }

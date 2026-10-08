@@ -121,17 +121,6 @@
     }
   }
 
-  /* ---------- Aparición suave ---------- */
-  function initReveal() {
-    var els = document.querySelectorAll('.rv');
-    if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('is-in'); }); return; }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: .05 });
-    els.forEach(function (el) { io.observe(el); });
-    window.addEventListener('beforeprint', function () { els.forEach(function (el) { el.classList.add('is-in'); }); });
-  }
-
   /* ---------- Modal de tienda ---------- */
   var modal, gal = { imgs: [], i: 0, logo: false }, storeFocus = null;
   function ensureModal() {
@@ -354,6 +343,6 @@
   window.pubNext = function () { pubStep(1); };
   window.SiteUI = { ICON: ICON, slug: slug, qs: qs, stores: stores, events: events, logoHTML: logoHTML, cardHTML: cardHTML, telDigits: telDigits };
 
-  function init() { initHeader(); initDirectory(); initFeatured(); initReveal(); }
+  function init() { initHeader(); initDirectory(); initFeatured();}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

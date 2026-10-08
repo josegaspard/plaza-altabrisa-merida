@@ -19,7 +19,7 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=M+PLUS+Rounded+1c:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&amp;family=Red+Hat+Text:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
 <script>document.documentElement.classList.add('js')</script>
 <link rel="preload" as="image" href="images/home/slot-1.jpg" media="(min-width: 641px)">
@@ -63,21 +63,21 @@
 
 <main id="main">
   <section class="hero" aria-labelledby="heroTitle">
-    <div class="hero-frame">
-      <div class="hero-media">
-        <picture>
-          <source media="(max-width: 640px)" srcset="images/home/slot-1-mob.jpg">
-          <img src="images/home/slot-1.jpg" alt="Fuentes y palmeras en la entrada de Plaza Altabrisa Mérida" width="1600" height="900" fetchpriority="high">
-        </picture>
-      </div>
-      <div class="hero-card">
+    <div class="container hero-head">
+      <div>
         <p class="hero-place"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mérida, Yucatán</p>
         <h1 class="hero-title" id="heroTitle" data-cc="nombre">Plaza Altabrisa Mérida</h1>
-        <div class="hero-actions">
-          <a class="btn btn-sol" href="directorio.html">Ver directorio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          <a class="btn btn-line" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza%20Altabrisa%2C%20Calle%207%20452%2C%20M%C3%A9rida%2C%20Yuc." target="_blank" rel="noopener">Cómo llegar</a>
-        </div>
       </div>
+      <div class="hero-actions">
+        <a class="btn btn-sol" href="directorio.html">Ver directorio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-line" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza%20Altabrisa%2C%20Calle%207%20452%2C%20M%C3%A9rida%2C%20Yuc." target="_blank" rel="noopener">Cómo llegar</a>
+      </div>
+    </div>
+    <div class="hero-media">
+      <picture>
+        <source media="(max-width: 640px)" srcset="images/home/slot-1-mob.jpg">
+        <img src="images/home/slot-1.jpg" alt="Fuentes y palmeras en la entrada de Plaza Altabrisa Mérida" width="1600" height="900" fetchpriority="high">
+      </picture>
     </div>
   </section>
 
@@ -98,12 +98,12 @@
   <section class="section section-alt" aria-labelledby="accTitle">
     <div class="container">
       <div class="section-head rv">
-        <h2 class="h2" id="accTitle">Accesos</h2>
+        <div><p class="kicker">Navegación</p><h2 class="h2" id="accTitle">Accesos</h2></div>
       </div>
       <div class="access-grid">
-        <a class="access rv" href="directorio.html"><img src="images/home/slot-2.jpg" alt="Pasillo de tiendas en dos niveles de Plaza Altabrisa" width="1200" height="675" loading="lazy"><span class="access-label"><strong>Directorio</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
-        <a class="access rv" href="mapa.html"><img src="images/home/slot-3.jpg" alt="Vista de Plaza Altabrisa y su estacionamiento al atardecer" width="1200" height="675" loading="lazy"><span class="access-label"><strong>Mapa</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
-        <a class="access rv" href="eventosypromociones.html"><img src="images/home/slot-4.jpg" alt="Cartel ¡Bienvenido al otoño! de Plaza Altabrisa Mérida" width="1200" height="675" loading="lazy"><span class="access-label"><strong>Eventos y Promociones</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
+        <a class="access rv" href="directorio.html"><span class="access-media"><img src="images/home/slot-2.jpg" alt="Pasillo de tiendas en dos niveles de Plaza Altabrisa" width="1200" height="675" loading="lazy"></span><span class="access-label"><strong>Directorio</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
+        <a class="access rv" href="mapa.html"><span class="access-media"><img src="images/home/slot-3.jpg" alt="Vista de Plaza Altabrisa y su estacionamiento al atardecer" width="1200" height="675" loading="lazy"></span><span class="access-label"><strong>Mapa</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
+        <a class="access rv" href="eventosypromociones.html"><span class="access-media"><img src="images/home/slot-4.jpg" alt="Cartel ¡Bienvenido al otoño! de Plaza Altabrisa Mérida" width="1200" height="675" loading="lazy"></span><span class="access-label"><strong>Eventos y Promociones</strong><span class="access-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span></a>
       </div>
     </div>
   </section>
@@ -121,7 +121,6 @@
   <section class="section section-tight" aria-labelledby="visitTitle">
     <div class="container">
       <div class="visit rv">
-        <span class="tile-deco" aria-hidden="true"></span>
         <div>
           <h2 id="visitTitle">Cómo llegar</h2>
           <div class="visit-data">
