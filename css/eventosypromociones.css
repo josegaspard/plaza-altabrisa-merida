@@ -1,0 +1,17 @@
+/* Eventos y Promociones — ajustes propios de la página */
+.pub-wrap { padding-bottom: var(--s-2); }
+.pub-empty { flex-wrap: wrap; }
+.pub-empty p { flex: 1 1 220px; font-size: var(--fs-l); color: var(--tinta); font-weight: 600; }
+.pub-empty .link-arrow { margin-left: auto; }
+@media (max-width: 480px) {
+  .pub-empty { padding: var(--s-5); }
+  .pub-empty .link-arrow { margin-left: 0; }
+}
+
+/* El título largo no debe pisar la loseta del hero en móvil */
+@media (max-width: 640px) {
+  .page-hero-box { padding-top: 104px; }
+  .page-hero-box::before { width: 116px; top: 14px; right: -44px; }
+  .page-hero-box::after { top: 26px; right: 96px; }
+  .page-title { font-size: clamp(2.5rem, 12.5vw, 3.6rem); }
+}

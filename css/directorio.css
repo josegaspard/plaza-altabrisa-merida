@@ -1,0 +1,12 @@
+/* Directorio — Plaza Altabrisa Mérida */
+.dir-section { padding-top: clamp(32px, 5vw, 64px); }
+
+/* Logo de tarjeta en caja 4:3 fija (con o sin logo, todas iguales) */
+#dirGrid .store-logo { min-height: 0; overflow: hidden; }
+
+/* Galería del modal: las fotos de las tiendas son 16:9; se ven enteras, sin recorte */
+.modal .gal-main { aspect-ratio: 16 / 9; }
+.modal .gal-main > img { object-fit: contain; }
+@media (min-width: 761px) {
+  .modal .gal { justify-content: center; }
+}

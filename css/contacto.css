@@ -1,0 +1,32 @@
+/* Contacto — Plaza Altabrisa Mérida */
+
+.ct-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+@media (max-width: 900px) { .ct-grid { grid-template-columns: 1fr; } }
+.ct-head { margin-bottom: var(--s-6); }
+.ct-facts { padding-top: 0; }
+.ct-facts .fact { align-items: start; }
+.ct-facts .fact > span:last-child { min-width: 0; }
+.ct-facts .fact-value { overflow-wrap: anywhere; }
+.ct-facts .fact:nth-child(4) .fact-ico { background: var(--azul-50); color: var(--azul); }
+.ct-facts .social { margin-top: var(--s-2); }
+
+.ct-form-title { font-size: var(--fs-h3); margin-bottom: var(--s-5); color: var(--azul); }
+.ct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
+.ct-actions .btn { min-width: 200px; }
+.check a { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; }
+.check { align-items: center; }
+.check input { margin: 0; }
+@media (max-width: 640px) { .ct-actions .btn { flex: 1 1 100%; } }
+
+.ct-map { border-radius: var(--r-l); overflow: hidden; border: 1px solid var(--linea); background: var(--azul-50); }
+.ct-map iframe { width: 100%; height: clamp(320px, 42vw, 480px); border: 0; }
+
+.ct-rent { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(24px, 4vw, 56px); align-items: start; box-shadow: none; }
+@media (max-width: 900px) { .ct-rent { grid-template-columns: 1fr; } }
+.ct-rent-title { font-size: var(--fs-h3); margin: var(--s-2) 0 var(--s-3); }
+.ct-rent-mail { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
+.ct-rent-mail svg { width: 20px; height: 20px; flex: none; color: var(--azul); }
+.ct-rent-mail a { display: inline-flex; align-items: center; min-height: 44px; color: var(--tinta); min-width: 0; }
+.ct-rent-mail a:hover { color: var(--azul); }
+.ct-rent .field textarea { min-height: 110px; }
+@media (max-width: 480px) { .ct-rent-mail { font-size: var(--fs-s); gap: 8px; } .ct-rent-mail svg { width: 18px; height: 18px; } }

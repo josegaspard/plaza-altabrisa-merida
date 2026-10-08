@@ -1,0 +1,79 @@
+/* Mapa — Plaza Altabrisa Mérida */
+.map-section { padding-top: clamp(32px, 5vw, 64px); }
+.fam-libre { --fam: var(--linea); }
+
+.map-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4) var(--s-6); margin-bottom: var(--s-5); }
+.map-bar .tab { min-height: 44px; }
+.map-bar .legend { color: var(--texto); }
+.map-bar .legend .fam-libre i { background: color-mix(in srgb, var(--gris) 22%, var(--fondo)); }
+
+.map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--s-5); align-items: start; }
+.map-card { position: relative; min-width: 0; border: 1px solid var(--linea); border-radius: var(--r-l); background: var(--fondo); padding: clamp(8px, 1.6vw, 20px); }
+.map-floor[hidden] { display: none; }
+.map-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.m-svg { width: 100%; height: auto; max-width: none; }
+.map-hint { display: none; margin: var(--s-2) 0 0; font-size: var(--fs-xs); color: var(--gris); }
+
+/* Plano redibujado: colores por token */
+.m-base .m-block { fill: var(--fondo-2); }
+.m-base .m-line { fill: none; stroke: var(--linea); stroke-width: 1; }
+.m-top { pointer-events: none; }
+.m-top .m-num { fill: var(--tinta); }
+.m-top .m-guide { fill: none; stroke: var(--gris); stroke-width: 1.2; }
+.m-top polyline.m-guide { fill: var(--gris); stroke: none; }
+.m-top .m-ico-bg { fill: var(--azul-100); }
+.m-top .m-ico { fill: var(--azul); }
+.m-top .m-ico-w { fill: var(--fondo); }
+.m-top .m-acc { fill: var(--gris); }
+
+.m-local { cursor: pointer; outline: none; }
+.m-local .m-face { fill: color-mix(in srgb, var(--fam) 26%, var(--fondo)); stroke: var(--fondo); stroke-width: 1.6; transition: fill .15s var(--ease); }
+.m-local.is-free .m-face { fill: color-mix(in srgb, var(--gris) 12%, var(--fondo)); }
+.m-local:hover .m-face, .m-local.is-hit .m-face { fill: color-mix(in srgb, var(--fam) 55%, var(--fondo)); }
+.m-local.is-free:hover .m-face, .m-local.is-free.is-hit .m-face { fill: color-mix(in srgb, var(--gris) 28%, var(--fondo)); }
+.m-local.is-free.is-sel .m-face { fill: color-mix(in srgb, var(--gris) 34%, var(--fondo)); }
+.m-local.is-sel .m-face { fill: color-mix(in srgb, var(--fam) 62%, var(--fondo)); stroke: var(--tinta); stroke-width: 2.4; }
+.m-local:focus-visible .m-face { stroke: var(--sol); stroke-width: 4; }
+
+/* Ficha lateral */
+.map-info { position: sticky; top: calc(var(--hdr) + 16px); border: 1px solid var(--linea); border-radius: var(--r-l); background: var(--fondo); padding: var(--s-5); box-shadow: var(--sh-1); }
+.mi-head { display: flex; flex-direction: column; gap: var(--s-4); }
+.mi-logo { width: 96px; height: 72px; border-radius: var(--r-m); border: 1px solid var(--linea); background: var(--fondo); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+.mi-logo[hidden] { display: none; }
+.mi-logo img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.mi-kicker { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 var(--s-2); font-size: var(--fs-xs); font-weight: 700; color: var(--gris); letter-spacing: .02em; }
+.mi-kicker.is-fam { color: var(--tinta); }
+.mi-kicker.is-fam::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--fam); }
+.mi-name { font-size: var(--fs-h3); overflow-wrap: anywhere; }
+.mi-meta { margin: var(--s-2) 0 0; font-size: var(--fs-s); color: var(--texto); }
+.mi-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4); margin-top: var(--s-5); }
+.mi-actions[hidden] { display: none; }
+
+/* Listado de locales */
+.map-list-section .section-head { margin-bottom: var(--s-5); }
+.map-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--s-2); }
+.map-list[hidden] { display: none; }
+.map-list li { display: flex; }
+.ml-item { width: 100%; height: 100%; min-height: 44px; display: flex; align-items: center; gap: var(--s-3); padding: 8px 12px; text-align: left; border: 1px solid var(--linea); border-radius: var(--r-s); background: var(--fondo); transition: border-color .15s var(--ease); }
+.ml-item:hover, .ml-item.is-sel { border-color: var(--azul); }
+.ml-num { flex: none; min-width: 40px; padding: 2px 6px; border-radius: 6px; text-align: center; font-size: var(--fs-xs); font-weight: 700; color: var(--tinta); background: color-mix(in srgb, var(--fam) 26%, var(--fondo)); }
+.ml-item.is-free .ml-num { background: var(--fondo-2); color: var(--texto); }
+.ml-name { font-size: var(--fs-s); font-weight: 600; color: var(--tinta); overflow-wrap: anywhere; }
+.ml-item.is-free .ml-name { font-weight: 500; color: var(--gris); }
+
+@media (max-width: 959px) {
+  .map-layout { grid-template-columns: 1fr; }
+  .map-info { position: static; order: -1; padding: var(--s-4); box-shadow: none; }
+  .mi-head { flex-direction: row; align-items: center; }
+  .mi-logo { width: 72px; height: 56px; }
+  .mi-actions { margin-top: var(--s-3); }
+}
+@media (max-width: 760px) {
+  .m-svg { width: 860px; }
+  .map-hint { display: block; }
+  .map-bar { gap: var(--s-3); }
+  .map-bar .legend { gap: var(--s-2) var(--s-4); font-size: var(--fs-xs); }
+}
+@media (max-width: 480px) {
+  .map-list { grid-template-columns: 1fr; }
+}
