@@ -1,0 +1,34 @@
+/* Revisión de fotografías — Plaza Altabrisa Mérida */
+body { background: var(--fondo); padding-bottom: 88px; }
+.rv-top { border-bottom: 1px solid var(--linea); background: var(--fondo); }
+.rv-top-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.rv-top img { width: 150px; height: auto; }
+.rv-main { padding-block: clamp(32px, 5vw, 56px); }
+.rv-lead { max-width: 760px; color: var(--texto); margin: 12px 0 0; }
+.rv-sum { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; padding: 0; margin: 24px 0 8px; }
+.rv-sum li { background: var(--fondo-2); border: 1px solid var(--linea); border-radius: var(--r-m); padding: 12px 16px; color: var(--texto); }
+.rv-sum strong { color: var(--azul); font-size: 1.25em; margin-right: 4px; }
+.rv-note-gral { color: var(--gris); margin: 0; }
+.rv-h { color: var(--tinta); font-size: clamp(22px, 2.4vw, 28px); margin: clamp(40px, 5vw, 64px) 0 16px; padding-top: 16px; border-top: 1px solid var(--linea); }
+
+.rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.rv-card { border: 1px solid var(--linea); border-radius: var(--r-m); overflow: hidden; background: var(--fondo); display: flex; flex-direction: column; }
+.rv-card.is-marked { border-color: var(--rosa); box-shadow: 0 0 0 2px var(--rosa); }
+.rv-ph { display: grid; gap: 2px; background: var(--azul-50); }
+.rv-ph.n2 { grid-template-columns: 1fr 1fr; }
+.rv-ph img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.rv-body { padding: 12px 14px 14px; display: grid; gap: 8px; }
+.rv-body h3 { margin: 0; font-size: 16px; color: var(--tinta); }
+.rv-meta { margin: 0; font-size: 14px; color: var(--gris); }
+.rv-chk { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--texto); cursor: pointer; }
+.rv-chk input { width: 18px; height: 18px; accent-color: var(--rosa); }
+.rv-note { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--linea); border-radius: var(--r-s); color: var(--tinta); }
+.rv-note:focus { outline: 2px solid var(--azul); outline-offset: 1px; }
+
+.rv-sin { list-style: none; padding: 0; margin: 16px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.rv-sin li { border: 1px solid var(--linea); border-radius: var(--r-s); padding: 10px 12px; color: var(--tinta); display: flex; flex-direction: column; gap: 2px; }
+.rv-sin span { font-size: 13px; color: var(--gris); }
+
+.rv-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--fondo); border-top: 1px solid var(--linea); box-shadow: var(--sh-2); }
+.rv-bar-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; flex-wrap: wrap; }
+#rvCount { color: var(--tinta); font-weight: 600; }
