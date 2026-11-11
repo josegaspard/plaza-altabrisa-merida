@@ -86,11 +86,20 @@
     var ini = val(s.name).replace(/[^A-Za-zÀ-ÿ0-9 ]/g, '').split(' ').filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
     return '<span class="store-ph" aria-hidden="true">' + esc(ini || '·') + '</span>';
   }
+  /* Foto real del local para el fondo de la tarjeta: miniatura card.webp de la sesión de fotos;
+     si no, la primera foto del gestor (no las de catálogo «1.jpg»); si no hay, tarjeta sin foto. */
+  function cardPhoto(s) {
+    var a = [].concat(s.imgs || []).map(val).filter(Boolean), m, i;
+    for (i = 0; i < a.length; i++) { m = a[i].match(/^(.*\/)(?:altabrisa-\d+|[ab]-\d+)\.(?:webp|jpg)$/i); if (m) return m[1] + 'card.webp'; }
+    return a.length && !/\/\d+\.(?:jpe?g|png|webp)$/i.test(a[0]) ? a[0] : '';
+  }
   function cardHTML(s, asLink) {
-    var fam = famClass(familiaDe(s.cat));
-    var inner = '<span class="store-logo">' + logoHTML(s) + '</span><span class="store-name">' + esc(s.name) + '</span>';
-    if (asLink) return '<a class="store-card ' + fam + '" href="directorio.html?tienda=' + encodeURIComponent(val(s.name)) + '">' + inner + '</a>';
-    return '<button type="button" class="store-card ' + fam + '" data-store="' + esc(s.name) + '" aria-label="' + esc(s.name) + '">' + inner + '</button>';
+    var fam = famClass(familiaDe(s.cat)), ph = cardPhoto(s);
+    var inner = (ph ? '<img class="store-photo" src="' + esc(ph) + '" alt="" loading="lazy" decoding="async">' : '') +
+      '<span class="store-glass"><span class="store-logo">' + logoHTML(s) + '</span><span class="store-name">' + esc(s.name) + '</span></span>';
+    var cls = 'store-card ' + fam + (ph ? ' has-photo' : '');
+    if (asLink) return '<a class="' + cls + '" href="directorio.html?tienda=' + encodeURIComponent(val(s.name)) + '">' + inner + '</a>';
+    return '<button type="button" class="' + cls + '" data-store="' + esc(s.name) + '" aria-label="' + esc(s.name) + '">' + inner + '</button>';
   }
 
   /* ---------- Cabecera y menú móvil ---------- */

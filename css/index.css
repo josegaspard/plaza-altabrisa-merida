@@ -34,3 +34,17 @@
 .gh-lb-next { right: 12px; top: 50%; transform: translateY(-50%); }
 .gh-lb-count { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; color: var(--fondo); font-size: 14px; }
 @media (prefers-reduced-motion: reduce) { .gh-item img { transition: none; } }
+
+/* Tiendas y restaurantes (fotos reales del local) */
+.gh-sub { font-family: var(--ff-titulo); font-size: var(--fs-h3); font-weight: 600; color: var(--tinta); margin: clamp(40px, 5vw, 64px) 0 clamp(16px, 2vw, 24px); }
+.gh-tiendas { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(8px, 1.2vw, 16px); grid-template-columns: repeat(3, 1fr); }
+.gh-tienda { position: relative; }
+.gh-tienda img { aspect-ratio: 16 / 10; }
+.gh-cap {
+  position: absolute; left: 10px; bottom: 10px; padding: 7px 12px; border-radius: var(--r-s);
+  font-family: var(--ff-titulo); font-weight: 600; font-size: var(--fs-xs); letter-spacing: .02em; color: var(--tinta);
+  border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .64);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+}
+@media (max-width: 1024px) { .gh-tiendas { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .gh-cap { left: 6px; bottom: 6px; padding: 5px 8px; font-size: .6875rem; } }
