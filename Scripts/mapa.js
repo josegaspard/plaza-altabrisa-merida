@@ -17,7 +17,7 @@
   function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
   var FAMS = ['Compras', 'Gastronomía', 'Entretenimiento', 'Servicios'];
   function famKey(f) { return norm(f).replace(/\s+/g, '-'); }
-  function famOf(s) { return window.familiaDe ? window.familiaDe(s && s.cat) : 'Compras'; }
+  function famOf(s) { return window.familiaTienda ? window.familiaTienda(s) : (window.familiaDe ? window.familiaDe(s && s.cat) : 'Compras'); }
 
   var byName = {};
   ST.forEach(function (s) { if (s && s.name) byName[norm(s.name)] = s; });

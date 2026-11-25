@@ -36,11 +36,11 @@
 
   /* ---------- Giro del gestor → familia ---------- */
   const GIRO_FAMILIA = {
-    'ropa interior': 'Compras', 'joyerias y relojerias': 'Compras', 'ninos': 'Compras', 'ropa de playa': 'Compras', 'supermercado': 'Compras', 'fitness': 'Servicios',
+    'ropa interior': 'Compras', 'joyerias y relojerias': 'Compras', 'ninos': 'Compras', 'ropa de playa': 'Compras', 'supermercado': 'Compras', 'fitness': 'Compras',
     'accesorios': 'Compras', 'bolsas': 'Compras', 'deportes': 'Compras', 'especialidades': 'Compras',
     'hogar': 'Compras', 'joyerias': 'Compras', 'joyeria': 'Compras', 'jugueterias': 'Compras', 'jugueteria': 'Compras',
     'moda caballeros': 'Compras', 'moda dama y caballero': 'Compras', 'moda damas': 'Compras', 'moda': 'Compras',
-    'moda infantil': 'Compras', 'opticas': 'Compras', 'optica': 'Compras', 'tecnologia': 'Compras',
+    'moda infantil': 'Compras', 'opticas': 'Servicios', 'optica': 'Servicios', 'tecnologia': 'Compras',
     'tiendas departamentales': 'Compras', 'tienda departamental': 'Compras', 'zapaterias': 'Compras', 'zapateria': 'Compras',
     'mascotas': 'Compras', 'belleza': 'Compras', 'perfumeria': 'Compras', 'perfumerias': 'Compras', 'libreria': 'Compras',
     'librerias': 'Compras', 'regalos': 'Compras', 'relojerias': 'Compras', 'lenceria': 'Compras', 'autoservicio': 'Compras',
@@ -51,13 +51,16 @@
     'entretenimiento': 'Entretenimiento', 'cines': 'Entretenimiento', 'cine': 'Entretenimiento', 'juegos': 'Entretenimiento',
     'diversion': 'Entretenimiento', 'boliche': 'Entretenimiento', 'casino': 'Entretenimiento',
     'academias': 'Servicios', 'academia': 'Servicios', 'agencias de viajes': 'Servicios', 'agencia de viajes': 'Servicios',
-    'bancos': 'Servicios', 'banco': 'Servicios', 'telefonia': 'Servicios', 'servicios': 'Servicios', 'salud': 'Servicios',
+    'bancos': 'Servicios', 'banco': 'Servicios', 'telefonia': 'Compras', 'servicios': 'Servicios', 'salud': 'Servicios',
     'farmacias': 'Servicios', 'farmacia': 'Servicios', 'gimnasios': 'Servicios', 'gimnasio': 'Servicios', 'spa': 'Servicios',
     'esteticas': 'Servicios', 'estetica': 'Servicios', 'lavanderias': 'Servicios', 'seguros': 'Servicios',
     'educacion': 'Servicios', 'consultorios': 'Servicios', 'tintorerias': 'Servicios', 'cajeros': 'Servicios'
   };
   var FAMILIAS = ['Compras', 'Gastronomía', 'Entretenimiento', 'Servicios'];
   function familia(cat) { return GIRO_FAMILIA[norm(cat)] || 'Compras'; }
+  /* Clasificación de Plaza Carso (25-nov-2026): ópticas en Servicios, telefonía en Compras; excepciones por tienda */
+  var FAMILIA_TIENDA = { 'sunglass hut': 'Compras' };
+  function familiaTienda(s) { return (s && FAMILIA_TIENDA[norm(s.name)]) || familia(s && s.cat); }
 
   /* ---------- Menú móvil ---------- */
   function initMenu() {
@@ -147,7 +150,7 @@
     function paint() {
       var list = order.filter(function (i) {
         var s = stores[i];
-        if (state.fam !== 'Todo' && familia(s.cat) !== state.fam) return false;
+        if (state.fam !== 'Todo' && familiaTienda(s) !== state.fam) return false;
         if (state.q && (norm(s.name) + ' ' + norm(s.cat)).indexOf(state.q) === -1) return false;
         return true;
       });
@@ -420,6 +423,7 @@
   window.norm = norm;
   window.GIRO_FAMILIA = GIRO_FAMILIA;
   window.familiaDe = familia;
+  window.familiaTienda = familiaTienda;
   window.openPub = openPub;
   window.openStore = function (s) { openStore(typeof s === 'string' ? findStore(s) : s); };
 
