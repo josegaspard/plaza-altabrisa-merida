@@ -1,31 +1,37 @@
-/* Contacto — Plaza Altabrisa Mérida */
+/* Contacto: complementos de página (el resto vive en site.css) */
 
-.ct-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
-@media (max-width: 900px) { .ct-grid { grid-template-columns: 1fr; } }
-.ct-head { margin-bottom: var(--s-6); }
-.ct-facts { padding-top: 0; }
-.ct-facts .fact { align-items: start; }
-.ct-facts .fact > span:last-child { min-width: 0; }
-.ct-facts .fact-value { overflow-wrap: anywhere; }
-.ct-facts .social { margin-top: var(--s-2); }
+.contact-grid { align-items: start; }
+.ct-info .h-section, .ct-form .h-section { margin-bottom: var(--s5); }
+.ct-list { margin: 0; border-top: 1px solid var(--ink); }
+.ct-row { display: grid; grid-template-columns: 130px 1fr; gap: var(--s3); padding: var(--s4) 0; border-bottom: 1px solid var(--line); }
+.ct-row dt { font-family: var(--f-display); font-weight: 500; font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; color: var(--grey-text); padding-top: 4px; }
+.ct-row dd { margin: 0; font-size: var(--fs-md); line-height: 1.55; color: var(--ink-soft); overflow-wrap: anywhere; }
+.ct-row dd a { color: var(--ink); border-bottom: 1px solid var(--line); transition: border-color .2s; }
+.ct-row dd a:hover { border-color: var(--ink); }
+.ct-row dd .social a { border: 1px solid currentColor; }
+.ct-tels { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.ct-tels a, .ct-row dd > a { display: inline-block; padding: 10px 0; margin: -10px 0; }
+.ct-route { margin-top: var(--s5); }
 
-.ct-form-title { font-size: var(--fs-h3); margin-bottom: var(--s-5); color: var(--azul); }
-.ct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
-.ct-actions .btn { min-width: 200px; }
-.check a { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; }
-.check { align-items: center; }
-.check input { margin: 0; }
-@media (max-width: 640px) { .ct-actions .btn { flex: 1 1 100%; } }
+.ct-form .form { gap: var(--s4); }
+.ct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s4); margin-top: var(--s2); }
+.form-msg { margin: 0; color: var(--ink); }
+.form-msg:empty { display: none; }
 
-.ct-map { border-radius: var(--r-l); overflow: hidden; border: 1px solid var(--linea); background: var(--azul-50); }
-.ct-map iframe { width: 100%; height: clamp(320px, 42vw, 480px); border: 0; }
+.ct-map-section .h-section { margin-bottom: var(--s5); }
+.ct-map { border: 1px solid var(--line); }
 
-.ct-rent { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(24px, 4vw, 56px); align-items: start; box-shadow: none; }
-@media (max-width: 900px) { .ct-rent { grid-template-columns: 1fr; } }
-.ct-rent-title { font-size: var(--fs-h3); margin: var(--s-2) 0 var(--s-3); }
-.ct-rent-mail { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
-.ct-rent-mail svg { width: 20px; height: 20px; flex: none; color: var(--azul); }
-.ct-rent-mail a { display: inline-flex; align-items: center; min-height: 44px; color: var(--tinta); min-width: 0; }
-.ct-rent-mail a:hover { color: var(--azul); }
-.ct-rent .field textarea { min-height: 110px; }
-@media (max-width: 480px) { .ct-rent-mail { font-size: var(--fs-s); gap: 8px; } .ct-rent-mail svg { width: 18px; height: 18px; } }
+.ct-rent { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
+.ct-rent__mail { margin: var(--s4) 0 0; font-size: var(--fs-md); overflow-wrap: anywhere; }
+.ct-rent__mail a { border-bottom: 1px solid var(--ink); padding: 10px 0; }
+.ct-rent textarea.field { min-height: 110px; }
+.ct-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+
+@media (max-width: 899px) {
+  .ct-rent { grid-template-columns: 1fr; }
+}
+@media (max-width: 599px) {
+  .ct-row { grid-template-columns: 1fr; gap: 6px; }
+  .ct-pair { grid-template-columns: 1fr; }
+  .ct-actions .btn { flex: 1 1 100%; }
+}

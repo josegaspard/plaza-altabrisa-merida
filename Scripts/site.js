@@ -1,7 +1,9 @@
 /* Plaza Altabrisa Mérida — JS compartido (sin dependencias).
-   Datos que lee de la página (si existen): const STORES, const EVENTS. */
+   Las páginas declaran sus datos en línea ANTES de cargar este archivo (con defer):
+   const STORES = [...];   const EVENTS = [...];   const LOCAL_STORE = {...}; */
 (function () {
   'use strict';
+  document.documentElement.classList.add('js');
 
   /* ---------- Utilidades ---------- */
   function norm(s) {
@@ -14,350 +16,417 @@
     });
   }
   function val(v) { return v == null ? '' : String(v).trim(); }
-  function slug(s) { return norm(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function setInert(on, keep) {
-    ['.site-header', 'main', '.site-footer', '.mob-panel', '.skip'].forEach(function (sel) {
-      document.querySelectorAll(sel).forEach(function (el) {
-        if (keep && (el === keep || el.contains(keep))) return;
-        if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert');
-      });
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+  function getStores() { return (typeof STORES !== 'undefined' && Array.isArray(STORES)) ? STORES : []; }
+  function getEvents() { return (typeof EVENTS !== 'undefined' && Array.isArray(EVENTS)) ? EVENTS : []; }
+  /* Fondo inerte mientras hay un diálogo o el menú abierto (foco y lectores no salen de él) */
+  function setInert(on, sels) {
+    $$(sels || 'body > header, main, body > footer').forEach(function (el) {
+      if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert');
     });
   }
-  function trapTab(e, box) {
-    if (e.key !== 'Tab' || !box) return;
-    var f = Array.prototype.filter.call(box.querySelectorAll('a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'),
-      function (el) { return !el.disabled && !el.hidden && el.offsetParent !== null; });
-    if (!f.length) return;
-    var first = f[0], last = f[f.length - 1];
-    if (e.shiftKey && (document.activeElement === first || !box.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && (document.activeElement === last || !box.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
-  }
-  function qs(name) { try { return new URLSearchParams(location.search).get(name); } catch (e) { return null; } }
-
   var ICON = {
-    left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
-    right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
-    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
-    web: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
-    ig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
-    fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H8v3h2.5V21h3z"/></svg>',
-    tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg>',
-    map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'
+    prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M15 4l-8 8 8 8"/></svg>',
+    next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 4l8 8-8 8"/></svg>',
+    fb: '<svg viewBox="0 0 24 24"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z"/></svg>',
+    ig: '<svg viewBox="0 0 24 24"><path d="M12 7.3A4.7 4.7 0 1 0 12 16.7 4.7 4.7 0 0 0 12 7.3zm0 7.7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm6-7.9a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0zM21.9 8c-.1-1.6-.4-3-1.6-4.2S17.6 2.2 16 2.1C14.4 2 9.6 2 8 2.1 6.4 2.2 5 2.5 3.8 3.7S2.2 6.4 2.1 8C2 9.6 2 14.4 2.1 16c.1 1.6.4 3 1.6 4.2s2.6 1.5 4.2 1.6c1.6.1 6.4.1 8 0 1.6-.1 3-.4 4.2-1.6s1.5-2.6 1.6-4.2c.1-1.6.1-6.4 0-8zm-2.1 9.8a3.2 3.2 0 0 1-1.8 1.8c-1.3.5-4.3.4-5.6.4s-4.4.1-5.6-.4a3.2 3.2 0 0 1-1.8-1.8c-.5-1.3-.4-4.3-.4-5.6s-.1-4.4.4-5.6A3.2 3.2 0 0 1 6.8 4.6C8 4.1 11 4.2 12.4 4.2s4.4-.1 5.6.4a3.2 3.2 0 0 1 1.8 1.8c.5 1.3.4 4.3.4 5.6s.1 4.4-.4 5.6z"/></svg>',
+    web: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3z"/></svg>'
   };
 
-  /* ---------- Giro del gestor → familia del diseño ---------- */
-  var FAMILIAS = ['Compras', 'Gastronomía', 'Entretenimiento', 'Servicios'];
-  var GIRO_FAMILIA = {
-    'accesorios': 'Compras', 'bolsas': 'Compras', 'deportes': 'Compras', 'dulces': 'Compras',
-    'especialidades': 'Compras', 'hogar': 'Compras', 'ropa interior': 'Compras', 'joyerias': 'Compras',
-    'joyerias y relojerias': 'Compras', 'jugueterias': 'Compras', 'moda caballeros': 'Compras',
-    'moda dama y caballero': 'Compras', 'moda damas': 'Compras', 'ninos': 'Compras', 'perfumerias': 'Compras',
-    'regalos': 'Compras', 'ropa de playa': 'Compras', 'supermercado': 'Compras', 'tecnologia': 'Compras',
-    'tiendas departamentales': 'Compras', 'zapaterias': 'Compras', 'mascotas': 'Compras', 'libreria': 'Compras',
-    'alimentos': 'Gastronomía', 'comida rapida': 'Gastronomía', 'restaurantes': 'Gastronomía',
-    'cafeteria': 'Gastronomía', 'cafeterias': 'Gastronomía', 'food court': 'Gastronomía',
-    'entretenimiento': 'Entretenimiento', 'cine': 'Entretenimiento', 'cines': 'Entretenimiento',
-    'gimnasio': 'Entretenimiento', 'fitness': 'Entretenimiento',
-    'agencias de viajes': 'Servicios', 'bancos': 'Servicios', 'belleza': 'Servicios', 'opticas': 'Servicios',
-    'salud': 'Servicios', 'telefonia': 'Compras', 'academias': 'Servicios', 'servicios': 'Servicios'
+  /* ---------- Giro del gestor → familia ---------- */
+  const GIRO_FAMILIA = {
+    'ropa interior': 'Compras', 'joyerias y relojerias': 'Compras', 'ninos': 'Compras', 'ropa de playa': 'Compras', 'supermercado': 'Compras', 'fitness': 'Compras',
+    'accesorios': 'Compras', 'bolsas': 'Compras', 'deportes': 'Compras', 'especialidades': 'Compras',
+    'hogar': 'Compras', 'joyerias': 'Compras', 'joyeria': 'Compras', 'jugueterias': 'Compras', 'jugueteria': 'Compras',
+    'moda caballeros': 'Compras', 'moda dama y caballero': 'Compras', 'moda damas': 'Compras', 'moda': 'Compras',
+    'moda infantil': 'Compras', 'opticas': 'Servicios', 'optica': 'Servicios', 'tecnologia': 'Compras',
+    'tiendas departamentales': 'Compras', 'tienda departamental': 'Compras', 'zapaterias': 'Compras', 'zapateria': 'Compras',
+    'mascotas': 'Compras', 'belleza': 'Compras', 'perfumeria': 'Compras', 'perfumerias': 'Compras', 'libreria': 'Compras',
+    'librerias': 'Compras', 'regalos': 'Compras', 'relojerias': 'Compras', 'lenceria': 'Compras', 'autoservicio': 'Compras',
+    'alimentos': 'Gastronomía', 'comida rapida': 'Gastronomía', 'restaurantes': 'Gastronomía', 'restaurante': 'Gastronomía',
+    'dulces': 'Gastronomía', 'cafeterias': 'Gastronomía', 'cafeteria': 'Gastronomía', 'cafe': 'Gastronomía',
+    'heladerias': 'Gastronomía', 'helados': 'Gastronomía', 'postres': 'Gastronomía', 'panaderias': 'Gastronomía',
+    'bebidas': 'Gastronomía', 'bares': 'Gastronomía', 'food court': 'Gastronomía', 'comida': 'Gastronomía',
+    'entretenimiento': 'Entretenimiento', 'cines': 'Entretenimiento', 'cine': 'Entretenimiento', 'juegos': 'Entretenimiento',
+    'diversion': 'Entretenimiento', 'boliche': 'Entretenimiento', 'casino': 'Entretenimiento',
+    'academias': 'Servicios', 'academia': 'Servicios', 'agencias de viajes': 'Servicios', 'agencia de viajes': 'Servicios',
+    'bancos': 'Servicios', 'banco': 'Servicios', 'telefonia': 'Compras', 'servicios': 'Servicios', 'salud': 'Servicios',
+    'farmacias': 'Servicios', 'farmacia': 'Servicios', 'gimnasios': 'Servicios', 'gimnasio': 'Servicios', 'spa': 'Servicios',
+    'esteticas': 'Servicios', 'estetica': 'Servicios', 'lavanderias': 'Servicios', 'seguros': 'Servicios',
+    'educacion': 'Servicios', 'consultorios': 'Servicios', 'tintorerias': 'Servicios', 'cajeros': 'Servicios'
   };
-  function familiaDe(cat) { return GIRO_FAMILIA[norm(cat)] || 'Compras'; }
+  var FAMILIAS = ['Compras', 'Gastronomía', 'Entretenimiento', 'Servicios'];
+  function familia(cat) { return GIRO_FAMILIA[norm(cat)] || 'Compras'; }
   /* Clasificación de Plaza Carso (25-nov-2026): ópticas en Servicios, telefonía en Compras; excepciones por tienda */
   var FAMILIA_TIENDA = { 'sunglass hut': 'Compras' };
-  function familiaTienda(s) { return (s && FAMILIA_TIENDA[norm(s.name)]) || familiaDe(s && s.cat); }
-  function famClass(f) { return 'fam-' + slug(f); }
+  function familiaTienda(s) { return (s && FAMILIA_TIENDA[norm(s.name)]) || familia(s && s.cat); }
 
-  function stores() { try { return Array.isArray(STORES) ? STORES : []; } catch (e) { return []; } }
-  function events() { try { return Array.isArray(EVENTS) ? EVENTS : []; } catch (e) { return []; } }
-  function findStore(name) {
-    var n = norm(name), list = stores();
-    for (var i = 0; i < list.length; i++) if (norm(list[i].name) === n) return list[i];
-    for (var j = 0; j < list.length; j++) if (norm(list[j].name).indexOf(n) === 0) return list[j];
-    return null;
+  /* ---------- Menú móvil ---------- */
+  function initMenu() {
+    var btn = $('.menu-btn');
+    if (!btn) return;
+    function set(open) {
+      document.body.classList.toggle('menu-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      setInert(open, 'main, body > footer');
+    }
+    btn.addEventListener('click', function () { set(!document.body.classList.contains('menu-open')); });
+    $$('.nav a').forEach(function (a) { a.addEventListener('click', function () { set(false); }); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+    window.addEventListener('resize', function () { if (window.innerWidth > 979) set(false); });
   }
-  function byName(a, b) { return norm(a.name).localeCompare(norm(b.name), 'es'); }
 
-  function linkWeb(u) { u = val(u); if (!u) return ''; return /^https?:\/\//i.test(u) ? u : 'https://' + u.replace(/^\/+/, ''); }
-  function linkIg(u) { u = val(u); if (!u) return ''; if (/^https?:\/\//i.test(u)) return u; if (/instagram\.com/i.test(u)) return 'https://' + u.replace(/^\/+/, ''); return 'https://www.instagram.com/' + u.replace(/^@/, '') + '/'; }
-  function linkFb(u) { u = val(u); if (!u) return ''; if (/^https?:\/\//i.test(u)) return u; if (/facebook\.com/i.test(u)) return 'https://' + u.replace(/^\/+/, ''); return 'https://www.facebook.com/' + u.replace(/^@/, ''); }
-  function telDigits(t) { var d = val(t).replace(/\D/g, ''); if (d.length > 10 && d.indexOf('01') === 0) d = d.slice(2); return d.length > 10 ? d.slice(-10) : d; }
-
-  function logoHTML(s, cls) {
-    var logo = val(s.logo);
-    if (logo) return '<img src="' + esc(logo) + '" alt="' + esc(s.name) + '" loading="lazy" decoding="async"' + (cls ? ' class="' + cls + '"' : '') + '>';
-    var ini = val(s.name).replace(/[^A-Za-zÀ-ÿ0-9 ]/g, '').split(' ').filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
-    return '<span class="store-ph" aria-hidden="true">' + esc(ini || '·') + '</span>';
-  }
+  /* ---------- Tarjeta de tienda ---------- */
   /* Foto real del local para el fondo de la tarjeta: miniatura card.webp de la sesión de fotos;
      si no, la primera foto del gestor (no las de catálogo «1.jpg»); si no hay, tarjeta sin foto. */
   function cardPhoto(s) {
-    var a = [].concat(s.imgs || []).map(val).filter(Boolean), m, i;
-    for (i = 0; i < a.length; i++) { m = a[i].match(/^(.*\/)(?:altabrisa-\d+|[ab]-\d+)\.(?:webp|jpg)$/i); if (m) return m[1] + 'card.webp'; }
+    var a = [].concat(s.imgs || []).map(val).filter(Boolean), m, k;
+    for (k = 0; k < a.length; k++) { m = a[k].match(/^(.*\/)(?:altabrisa-\d+|[ab]-\d+)\.(?:webp|jpg)$/i); if (m) return m[1] + 'card.webp'; }
     return a.length && !/\/\d+\.(?:jpe?g|png|webp)$/i.test(a[0]) ? a[0] : '';
   }
-  function cardHTML(s, asLink) {
-    var fam = famClass(familiaTienda(s)), ph = cardPhoto(s);
-    /* Etiqueta pequeña con solo el nombre (Carso, 25-nov-2026); sin foto, el logo ocupa la tarjeta */
-    var inner = (ph ? '<img class="store-photo" src="' + esc(ph) + '" alt="" loading="lazy" decoding="async">'
-      : '<span class="store-logo">' + logoHTML(s) + '</span>') +
-      '<span class="store-tag">' + esc(s.name) + '</span>';
-    var cls = 'store-card ' + fam + (ph ? ' has-photo' : '');
-    if (asLink) return '<a class="' + cls + '" href="directorio.html?tienda=' + encodeURIComponent(val(s.name)) + '">' + inner + '</a>';
-    return '<button type="button" class="' + cls + '" data-store="' + esc(s.name) + '" aria-label="' + esc(s.name) + '">' + inner + '</button>';
+  function cardHTML(s, i) {
+    var name = val(s.name) || 'Tienda';
+    var logo = val(s.logo), ph = cardPhoto(s);
+    var inner = logo
+      ? '<img class="store-card__logo" src="' + esc(logo) + '" alt="' + esc(name) + '" loading="lazy" decoding="async">'
+      : '<span class="store-card__txt">' + esc(name) + '</span>';
+    return '<button type="button" class="store-card' + (ph ? ' has-photo' : '') + '" data-i="' + i + '" aria-label="' + esc(name) + '">' +
+      (ph ? '<img class="store-card__photo" src="' + esc(ph) + '" alt="" loading="lazy" decoding="async">' : '') +
+      '<span class="store-card__glass">' + inner + '<span class="store-card__name">' + esc(name) + '</span></span></button>';
   }
-
-  /* ---------- Cabecera y menú móvil ---------- */
-  function initHeader() {
-    var root = document.documentElement, hdr = document.querySelector('.site-header'), btn = document.querySelector('.nav-toggle');
-    function setOpen(open) {
-      root.classList.toggle('nav-open', open);
-      document.body.classList.toggle('no-scroll', open);
-      if (btn) { btn.setAttribute('aria-expanded', open ? 'true' : 'false'); btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú'); }
-      document.querySelectorAll('main, .site-footer, .skip').forEach(function (el) { if (open) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
-      if (open) setTimeout(function () { var a = document.querySelector('.mob-panel a'); if (a) a.focus({ preventScroll: true }); }, 240);
-    }
-    if (btn) btn.addEventListener('click', function () { setOpen(!root.classList.contains('nav-open')); });
-    document.querySelectorAll('.mob-panel a').forEach(function (a) { a.addEventListener('click', function () { setOpen(false); }); });
-    document.addEventListener('keydown', function (e) {
-      if (!root.classList.contains('nav-open')) return;
-      if (e.key === 'Escape') { setOpen(false); if (btn) btn.focus(); return; }
-      if (e.key === 'Tab') {
-        var f = [btn].concat(Array.prototype.slice.call(document.querySelectorAll('.mob-panel a')));
-        var i = f.indexOf(document.activeElement);
-        if (i < 0 || (e.shiftKey && i === 0) || (!e.shiftKey && i === f.length - 1)) { e.preventDefault(); f[e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : 0].focus(); }
-      }
+  function bindCards(ctx) {
+    ctx.addEventListener('click', function (e) {
+      var c = e.target.closest('.store-card');
+      if (c) openStore(getStores()[+c.getAttribute('data-i')], c);
     });
-    window.addEventListener('resize', function () { if (window.innerWidth >= 960) setOpen(false); });
-    if (hdr) {
-      var onScroll = function () { hdr.classList.toggle('is-scrolled', window.scrollY > 8); };
-      window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
-    }
-  }
-
-  /* ---------- Modal de tienda ---------- */
-  var modal, gal = { imgs: [], i: 0, logo: false }, storeFocus = null;
-  function ensureModal() {
-    if (modal) return modal;
-    modal = document.createElement('div');
-    modal.className = 'modal'; modal.id = 'storeModal';
-    modal.setAttribute('role', 'dialog'); modal.setAttribute('aria-modal', 'true'); modal.setAttribute('aria-labelledby', 'storeModalName');
-    modal.innerHTML = '<div class="modal-box"><button type="button" class="modal-close" aria-label="Cerrar">' + ICON.close + '</button>' +
-      '<div class="gal"><div class="gal-main"><img alt=""><button type="button" class="gal-nav gal-prev" aria-label="Foto anterior">' + ICON.left + '</button>' +
-      '<button type="button" class="gal-nav gal-next" aria-label="Foto siguiente">' + ICON.right + '</button></div><div class="gal-thumbs"></div></div>' +
-      '<div class="modal-info"></div></div>';
-    document.body.appendChild(modal);
-    modal.addEventListener('click', function (e) { if (e.target === modal) closeStore(); });
-    modal.querySelector('.modal-close').addEventListener('click', closeStore);
-    modal.querySelector('.gal-prev').addEventListener('click', function () { showGal(gal.i - 1); });
-    modal.querySelector('.gal-next').addEventListener('click', function () { showGal(gal.i + 1); });
-    modal.querySelector('.gal-thumbs').addEventListener('click', function (e) { var b = e.target.closest('button[data-i]'); if (b) showGal(+b.getAttribute('data-i')); });
-    return modal;
-  }
-  function showGal(i) {
-    var n = gal.imgs.length; if (!n) return;
-    gal.i = (i + n) % n;
-    var main = modal.querySelector('.gal-main'), img = main.querySelector('img');
-    img.src = gal.imgs[gal.i]; main.classList.toggle('is-logo', gal.logo);
-    modal.querySelectorAll('.gal-thumbs button').forEach(function (b, k) { b.classList.toggle('is-on', k === gal.i); });
-  }
-  function openStore(nameOrStore) {
-    var s = typeof nameOrStore === 'object' ? nameOrStore : findStore(nameOrStore);
-    if (!s) return false;
-    ensureModal(); if (!modal.classList.contains('is-open')) storeFocus = document.activeElement;
-    var imgs = (Array.isArray(s.imgs) ? s.imgs : []).map(val).filter(Boolean);
-    if (!imgs.length && val(s.img)) imgs = [val(s.img)];
-    gal.logo = !imgs.length; gal.imgs = imgs.length ? imgs : (val(s.logo) ? [val(s.logo)] : []);
-    var galEl = modal.querySelector('.gal');
-    galEl.hidden = !gal.imgs.length;
-    modal.querySelector('.gal-main img').alt = val(s.name);
-    modal.querySelectorAll('.gal-nav').forEach(function (b) { b.hidden = gal.imgs.length < 2; });
-    var th = modal.querySelector('.gal-thumbs');
-    th.hidden = gal.imgs.length < 2;
-    th.innerHTML = gal.imgs.length > 1 ? gal.imgs.map(function (u, k) { return '<button type="button" data-i="' + k + '" aria-label="Foto ' + (k + 1) + '"><img src="' + esc(u) + '" alt="" loading="lazy"></button>'; }).join('') : '';
-    modal.querySelector('.modal-box').classList.toggle('no-gal', !gal.imgs.length);
-
-    var fam = familiaTienda(s), rows = [];
-    if (val(s.cat)) rows.push(['Giro', esc(val(s.cat).charAt(0) + val(s.cat).slice(1).toLowerCase())]);
-    if (val(s.num)) rows.push(['Local', esc(val(s.num))]);
-    if (val(s.loc)) rows.push(['Ubicación', esc(val(s.loc))]);
-    if (val(s.time)) rows.push(['Horario', esc(val(s.time))]);
-    if (val(s.tel)) rows.push(['Teléfono', '<a href="tel:' + telDigits(s.tel) + '">' + esc(val(s.tel)) + '</a>']);
-    var acts = [];
-    if (linkWeb(s.web)) acts.push('<a class="btn btn-line" href="' + esc(linkWeb(s.web)) + '" target="_blank" rel="noopener">' + ICON.web + 'Sitio web</a>');
-    var soc = '';
-    if (linkIg(s.ig)) soc += '<a href="' + esc(linkIg(s.ig)) + '" target="_blank" rel="noopener" aria-label="Instagram de ' + esc(s.name) + '">' + ICON.ig + '</a>';
-    if (linkFb(s.fb)) soc += '<a href="' + esc(linkFb(s.fb)) + '" target="_blank" rel="noopener" aria-label="Facebook de ' + esc(s.name) + '">' + ICON.fb + '</a>';
-    if (soc) acts.push('<div class="social">' + soc + '</div>');
-    if (val(s.num) && !/mapa\.html$/.test(location.pathname)) acts.push('<a class="link-arrow" href="mapa.html?tienda=' + encodeURIComponent(val(s.name)) + '">Ver en el mapa' + ICON.right + '</a>');
-
-    modal.querySelector('.modal-info').innerHTML =
-      (val(s.logo) && !gal.logo ? '<div class="modal-logo">' + logoHTML(s) + '</div>' : '') +
-      '<span class="chip ' + famClass(fam) + '">' + esc(fam) + '</span>' +
-      '<h2 class="modal-name" id="storeModalName">' + esc(s.name) + '</h2>' +
-      (val(s.desc) ? '<p class="modal-desc">' + esc(val(s.desc)) + '</p>' : '') +
-      (rows.length ? '<dl class="info-list">' + rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('') + '</dl>' : '') +
-      (acts.length ? '<div class="modal-actions">' + acts.join('') + '</div>' : '');
-    showGal(0);
-    modal.classList.add('is-open'); document.body.classList.add('no-scroll'); setInert(true, modal);
-    modal.querySelector('.modal-close').focus({ preventScroll: true });
-    return true;
-  }
-  function closeStore() {
-    if (!modal || !modal.classList.contains('is-open')) return;
-    modal.classList.remove('is-open'); document.body.classList.remove('no-scroll'); setInert(false);
-    if (/[?&]tienda=/.test(location.search)) { try { var u = new URL(location.href); u.searchParams.delete('tienda'); history.replaceState(null, '', u); } catch (e) {} }
-    if (storeFocus && storeFocus.focus) storeFocus.focus({ preventScroll: true });
+    // Logo roto → nombre en texto
+    ctx.addEventListener('error', function (e) {
+      var img = e.target;
+      if (img.tagName === 'IMG' && img.classList.contains('store-card__photo')) {
+        var c = img.closest('.store-card'); if (c) c.classList.remove('has-photo'); img.remove(); return;
+      }
+      if (img.tagName === 'IMG' && img.classList.contains('store-card__logo')) {
+        var t = document.createElement('span'); t.className = 'store-card__txt'; t.textContent = img.alt;
+        img.replaceWith(t);
+      }
+    }, true);
   }
 
   /* ---------- Directorio ---------- */
   function initDirectory() {
-    var grid = document.getElementById('dirGrid');
+    var grid = $('#dirGrid');
     if (!grid) return;
-    var tabsEl = document.getElementById('dirTabs'), input = document.getElementById('dirSearch'), countEl = document.getElementById('dirCount');
-    var list = stores().filter(function (s) { return s && val(s.name); }).slice().sort(byName);
+    var stores = getStores();
+    var tabsBox = $('#dirTabs'), input = $('#dirSearch'), count = $('#dirCount');
     var state = { fam: 'Todo', q: '' };
-    var famCount = { Todo: list.length };
-    FAMILIAS.forEach(function (f) { famCount[f] = 0; });
-    list.forEach(function (s) { famCount[familiaTienda(s)]++; });
-
-    var reqCat = qs('cat');
-    if (reqCat) FAMILIAS.forEach(function (f) { if (norm(f) === norm(reqCat)) state.fam = f; });
-
-    if (tabsEl) {
-      tabsEl.setAttribute('role', 'group'); tabsEl.setAttribute('aria-label', 'Familias');
-      tabsEl.innerHTML = ['Todo'].concat(FAMILIAS).map(function (f) {
-        return '<button type="button" class="tab' + (f === state.fam ? ' is-active' : '') + '" data-fam="' + f + '" aria-pressed="' + (f === state.fam) + '">' + f + ' <span class="tab-n">' + famCount[f] + '</span></button>';
+    var params = new URLSearchParams(location.search);
+    var pCat = params.get('cat');
+    if (pCat) {
+      var hit = FAMILIAS.filter(function (f) { return norm(f) === norm(pCat); })[0];
+      if (hit) state.fam = hit;
+    }
+    if (tabsBox) {
+      tabsBox.setAttribute('role', 'tablist');
+      tabsBox.innerHTML = ['Todo'].concat(FAMILIAS).map(function (f) {
+        return '<button type="button" class="tab" role="tab" data-fam="' + esc(f) + '" aria-selected="' + (f === state.fam) + '">' + esc(f) + '</button>';
       }).join('');
-      tabsEl.addEventListener('click', function (e) {
+      tabsBox.addEventListener('click', function (e) {
         var b = e.target.closest('.tab'); if (!b) return;
         state.fam = b.getAttribute('data-fam');
-        tabsEl.querySelectorAll('.tab').forEach(function (t) { t.setAttribute('aria-pressed', t === b ? 'true' : 'false'); t.classList.toggle('is-active', t === b); });
-        try { var u = new URL(location.href); if (state.fam === 'Todo') u.searchParams.delete('cat'); else u.searchParams.set('cat', state.fam); history.replaceState(null, '', u); } catch (err) {}
-        render();
+        $$('.tab', tabsBox).forEach(function (t) { t.setAttribute('aria-selected', t === b ? 'true' : 'false'); });
+        var u = new URL(location.href);
+        if (state.fam === 'Todo') u.searchParams.delete('cat'); else u.searchParams.set('cat', state.fam);
+        u.searchParams.delete('tienda');
+        history.replaceState(null, '', u);
+        paint();
       });
     }
-    if (input) {
-      var wrap = input.closest('.search');
-      if (wrap && !wrap.querySelector('svg')) wrap.insertAdjacentHTML('afterbegin', ICON.search);
-      input.addEventListener('input', function () { state.q = norm(input.value); render(); });
-    }
-    grid.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-store]'); if (b) openStore(b.getAttribute('data-store'));
+    if (input) input.addEventListener('input', function () { state.q = norm(input.value); paint(); });
+
+    var order = stores.map(function (s, i) { return i; }).sort(function (a, b) {
+      return norm(stores[a].name).localeCompare(norm(stores[b].name), 'es');
     });
-
-    function render() {
-      var shown = list.filter(function (s) {
+    function paint() {
+      var list = order.filter(function (i) {
+        var s = stores[i];
         if (state.fam !== 'Todo' && familiaTienda(s) !== state.fam) return false;
-        if (!state.q) return true;
-        return norm(s.name).indexOf(state.q) > -1 || norm(s.cat).indexOf(state.q) > -1;
+        if (state.q && (norm(s.name) + ' ' + norm(s.cat)).indexOf(state.q) === -1) return false;
+        return true;
       });
-      grid.innerHTML = shown.length ? shown.map(function (s) { return cardHTML(s, false); }).join('')
-        : '<p class="dir-empty">No encontramos tiendas con esa búsqueda.</p>';
-      if (countEl) countEl.innerHTML = '<strong>' + shown.length + '</strong> ' + (shown.length === 1 ? 'tienda' : 'tiendas');
+      grid.innerHTML = list.map(function (i) { return cardHTML(stores[i], i); }).join('');
+      if (count) count.textContent = list.length === 1 ? '1 tienda' : list.length + ' tiendas';
+      var empty = $('#dirEmpty');
+      if (empty) empty.hidden = list.length > 0;
     }
-    render();
+    bindCards(grid);
+    paint();
 
-    var reqStore = qs('tienda');
-    if (reqStore) setTimeout(function () { openStore(reqStore); }, 60);
+    var pT = params.get('tienda');
+    if (pT) {
+      var s = findStore(pT);
+      if (s) openStore(s);
+    }
+  }
+
+  function findStore(name) {
+    var n = norm(name), stores = getStores();
+    return stores.filter(function (s) { return norm(s.name) === n; })[0] ||
+      stores.filter(function (s) { return norm(s.name).indexOf(n) === 0; })[0] || null;
   }
 
   /* ---------- Marcas destacadas (portada) ---------- */
   function initFeatured() {
-    var grid = document.getElementById('featuredGrid');
-    if (!grid) return;
-    var max = parseInt(grid.getAttribute('data-max'), 10) || 12;
-    var skip = (grid.getAttribute('data-skip') || '').split('|').map(norm).filter(Boolean);
-    var withLogo = stores().filter(function (s) { return s && val(s.name) && val(s.logo) && skip.indexOf(norm(val(s.name))) < 0; });
-    if (!withLogo.length) return;
-    var pick = [], step = withLogo.length / Math.min(max, withLogo.length);
-    for (var i = 0; i < Math.min(max, withLogo.length); i++) pick.push(withLogo[Math.floor(i * step)]);
-    grid.innerHTML = pick.map(function (s) { return cardHTML(s, true); }).join('');
-    var sec = grid.closest('[data-featured]'); if (sec) sec.hidden = false;
+    var box = $('#featuredBrands');
+    if (!box) return;
+    var stores = getStores();
+    var max = +box.getAttribute('data-max') || 12;
+    var idx = stores.map(function (s, i) { return i; }).filter(function (i) { return val(stores[i].logo); }).slice(0, max);
+    var section = box.closest('[data-featured]');
+    if (!idx.length) { if (section) section.hidden = true; return; }
+    if (section) section.hidden = false;
+    box.innerHTML = idx.map(function (i) { return cardHTML(stores[i], i); }).join('');
+    bindCards(box);
+  }
+
+  /* Nº de tiendas (si el HTML trae STORES con datos) */
+  function initCount() {
+    var n = getStores().length;
+    if (!n) return;
+    $$('[data-cc="tiendas"]').forEach(function (el) { el.textContent = n + ' tiendas'; });
+  }
+
+  /* ---------- Modal de tienda ---------- */
+  var modal, gal = { imgs: [], i: 0 }, lastFocus;
+  function buildModal() {
+    modal = document.createElement('div');
+    modal.className = 'modal'; modal.id = 'storeModal';
+    modal.setAttribute('role', 'dialog'); modal.setAttribute('aria-modal', 'true'); modal.setAttribute('aria-labelledby', 'mName');
+    modal.innerHTML = '<div class="modal__panel"><button type="button" class="modal__close" aria-label="Cerrar"></button>' +
+      '<div class="gallery" id="mGallery"></div><div class="modal__info" id="mInfo"></div></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || e.target.closest('.modal__close')) closeStore();
+      if (e.target.closest('[data-g="prev"]')) stepGallery(-1);
+      if (e.target.closest('[data-g="next"]')) stepGallery(1);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!modal.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeStore();
+      if (e.key === 'ArrowLeft') stepGallery(-1);
+      if (e.key === 'ArrowRight') stepGallery(1);
+    });
+  }
+  function paintGallery() {
+    var g = $('#mGallery');
+    if (!gal.imgs.length) {
+      var logo = val(gal.store.logo);
+      g.className = 'gallery gallery--logo';
+      g.innerHTML = logo && !gal.noLogo ? '<img src="' + esc(logo) + '" alt="' + esc(gal.store.name) + '">'
+        : '<span class="store-card__txt">' + esc(val(gal.store.name)) + '</span>';
+      var li = $('img', g);
+      if (li) li.onerror = function () { gal.noLogo = true; paintGallery(); };
+      return;
+    }
+    g.className = 'gallery';
+    var multi = gal.imgs.length > 1;
+    g.innerHTML = '<img class="gallery__main" src="' + esc(gal.imgs[gal.i]) + '" alt="' + esc(gal.store.name) + '">' +
+      (multi ? '<span class="gallery__count">' + (gal.i + 1) + ' / ' + gal.imgs.length + '</span>' +
+        '<div class="gallery__nav"><button type="button" class="gallery__btn" data-g="prev" aria-label="Foto anterior">' + ICON.prev +
+        '</button><button type="button" class="gallery__btn" data-g="next" aria-label="Foto siguiente">' + ICON.next + '</button></div>' : '');
+    // Foto rota → se quita de la galería (sin fotos, queda el logo o el nombre)
+    $('.gallery__main', g).onerror = function () {
+      gal.imgs.splice(gal.i, 1);
+      if (gal.i >= gal.imgs.length) gal.i = 0;
+      paintGallery();
+    };
+  }
+  function stepGallery(d) {
+    if (gal.imgs.length < 2) return;
+    gal.i = (gal.i + d + gal.imgs.length) % gal.imgs.length;
+    paintGallery();
+  }
+  function link(href) { return /^https?:\/\//i.test(href) ? href : 'https://' + href.replace(/^\/+/, ''); }
+  function openStore(s, from) {
+    if (!s) return;
+    if (!modal) buildModal();
+    lastFocus = from || document.activeElement;
+    var imgs = [];
+    (Array.isArray(s.imgs) ? s.imgs : []).concat([s.img]).forEach(function (u) { u = val(u); if (u && imgs.indexOf(u) === -1) imgs.push(u); });
+    gal = { imgs: imgs, i: 0, store: s };
+    paintGallery();
+    var rows = [];
+    function row(k, v) { if (v) rows.push('<div class="modal__row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'); }
+    var num = val(s.num), loc = val(s.loc), time = val(s.time), tel = val(s.tel), web = val(s.web);
+    row('Local', esc(num));
+    row('Nivel', esc(loc));
+    row('Horario', esc(time));
+    if (tel) row('Teléfono', '<a href="tel:' + esc(tel.replace(/[^\d+]/g, '')) + '">' + esc(tel) + '</a>');
+    if (web) row('Sitio web', '<a href="' + esc(link(web)) + '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')) + '</a>');
+    var soc = '';
+    if (val(s.fb)) soc += '<a href="' + esc(link(val(s.fb))) + '" target="_blank" rel="noopener" aria-label="Facebook">' + ICON.fb + '</a>';
+    if (val(s.ig)) soc += '<a href="' + esc(link(val(s.ig))) + '" target="_blank" rel="noopener" aria-label="Instagram">' + ICON.ig + '</a>';
+    var showLogo = val(s.logo) && imgs.length;
+    $('#mInfo').innerHTML =
+      (showLogo ? '<img class="modal__logo" src="' + esc(s.logo) + '" alt="">' : '') +
+      (val(s.cat) ? '<span class="kicker">' + esc(s.cat) + '</span>' : '') +
+      '<h3 class="modal__name" id="mName">' + esc(val(s.name)) + '</h3>' +
+      (val(s.desc) ? '<p class="modal__desc">' + esc(s.desc) + '</p>' : '') +
+      (rows.length ? '<dl class="modal__rows">' + rows.join('') + '</dl>' : '') +
+      (soc ? '<div class="social modal__social">' + soc + '</div>' : '');
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    setInert(true);
+    $('.modal__close', modal).focus();
+    var u = new URL(location.href);
+    if (u.searchParams.get('tienda') !== s.name && $('#dirGrid')) { u.searchParams.set('tienda', s.name); history.replaceState(null, '', u); }
+  }
+  function closeStore() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setInert(false);
+    var u = new URL(location.href);
+    if (u.searchParams.has('tienda')) { u.searchParams.delete('tienda'); history.replaceState(null, '', u); }
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  /* ---------- Mapa: local → tienda ---------- */
+  function initMap() {
+    // Pestañas de nivel: <button class="tab" data-level="pb"> ↔ <div class="map-floor" data-level="pb">
+    $$('.tab[data-level]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var lv = b.getAttribute('data-level');
+        $$('.tab[data-level]').forEach(function (t) { t.setAttribute('aria-selected', t === b ? 'true' : 'false'); });
+        $$('.map-floor[data-level]').forEach(function (f) { f.hidden = f.getAttribute('data-level') !== lv; });
+      });
+    });
+    var locals = $$('[data-local]');
+    if (!locals.length) return;
+    var table = (typeof LOCAL_STORE !== 'undefined' && LOCAL_STORE) ? LOCAL_STORE : {};
+    locals.forEach(function (el) {
+      el.addEventListener('click', function () {
+        var f = el.getAttribute('data-floor'), l = el.getAttribute('data-local');
+        var name = table[f] && table[f][l];
+        if (name) openStore(findStore(name), el);
+      });
+    });
   }
 
   /* ---------- Eventos y promociones: lightbox ---------- */
-  var lb, pubIdx = -1, pubFocus = null;
-  function ensureLb() {
-    if (lb) return lb;
+  var lb, lbIndex = 0, lbFocus;
+  function buildLightbox() {
     lb = document.createElement('div');
-    lb.className = 'pub-lb'; lb.id = 'pubLb';
-    lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-labelledby', 'pubLbTitle');
-    lb.innerHTML = '<button type="button" class="pub-lb-close" aria-label="Cerrar">' + ICON.close + '</button>' +
-      '<button type="button" class="pub-lb-prev" aria-label="Anterior">' + ICON.left + '</button>' +
-      '<button type="button" class="pub-lb-next" aria-label="Siguiente">' + ICON.right + '</button>' +
-      '<div class="pub-lb-box"><div class="pub-lb-img"><img alt=""></div><div class="pub-lb-text"><span class="pub-lb-tag"></span><h2 class="pub-lb-title" id="pubLbTitle"></h2><p class="pub-lb-desc"></p></div></div>';
+    lb.className = 'lightbox'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
+    lb.innerHTML = '<div class="lightbox__stage"><img class="lightbox__img" alt=""></div>' +
+      '<div class="lightbox__info"><span class="kicker lightbox__tag"></span><h3 class="lightbox__title"></h3><p class="lightbox__desc"></p></div>' +
+      '<button type="button" class="lightbox__btn lightbox__prev" aria-label="Anterior">' + ICON.prev + '</button>' +
+      '<button type="button" class="lightbox__btn lightbox__next" aria-label="Siguiente">' + ICON.next + '</button>' +
+      '<button type="button" class="lightbox__close" aria-label="Cerrar"></button>';
     document.body.appendChild(lb);
-    lb.addEventListener('click', function (e) { if (e.target === lb) closePub(); });
-    lb.querySelector('.pub-lb-close').addEventListener('click', closePub);
-    lb.querySelector('.pub-lb-prev').addEventListener('click', function () { pubStep(-1); });
-    lb.querySelector('.pub-lb-next').addEventListener('click', function () { pubStep(1); });
-    return lb;
+    lb.addEventListener('click', function (e) {
+      if (e.target.closest('.lightbox__prev')) return stepPub(-1);
+      if (e.target.closest('.lightbox__next')) return stepPub(1);
+      if (e.target.closest('.lightbox__close') || e.target === lb || e.target.classList.contains('lightbox__stage')) closePub();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closePub();
+      if (e.key === 'ArrowLeft') stepPub(-1);
+      if (e.key === 'ArrowRight') stepPub(1);
+    });
   }
-  function renderPub(title, tag, desc, img) {
-    ensureLb();
-    var im = lb.querySelector('.pub-lb-img img'); im.src = val(img); im.alt = val(title); lb.querySelector('.pub-lb-img').hidden = !val(img);
-    var t = lb.querySelector('.pub-lb-tag'); t.textContent = val(tag); t.hidden = !val(tag);
-    lb.querySelector('.pub-lb-title').textContent = val(title);
-    var d = lb.querySelector('.pub-lb-desc'); d.textContent = val(desc); d.hidden = !val(desc);
-    var many = events().length > 1;
-    lb.querySelector('.pub-lb-prev').hidden = !many; lb.querySelector('.pub-lb-next').hidden = !many;
+  function showPub(p) {
+    $('.lightbox__img', lb).src = val(p.img);
+    $('.lightbox__img', lb).alt = val(p.title);
+    $('.lightbox__tag', lb).textContent = val(p.tag);
+    $('.lightbox__title', lb).textContent = val(p.title);
+    $('.lightbox__desc', lb).textContent = val(p.desc);
+    $('.lightbox__tag', lb).hidden = !val(p.tag);
+    $('.lightbox__desc', lb).hidden = !val(p.desc);
+    var many = getEvents().length > 1;
+    $('.lightbox__prev', lb).hidden = !many;
+    $('.lightbox__next', lb).hidden = !many;
+  }
+  function stepPub(d) {
+    var ev = getEvents(); if (ev.length < 2) return;
+    lbIndex = (lbIndex + d + ev.length) % ev.length;
+    showPub(ev[lbIndex]);
   }
   function openPub(title, tag, desc, img, ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
-    var list = events(); pubIdx = -1;
-    for (var i = 0; i < list.length; i++) {
-      if (val(list[i].title) === val(title) && (!img || val(list[i].img) === val(img))) { pubIdx = i; break; }
-    }
-    if (pubIdx < 0) for (var j = 0; j < list.length; j++) if (val(list[j].title) === val(title)) { pubIdx = j; break; }
-    renderPub(title, tag, desc, img);
-    if (!lb.classList.contains('is-open')) pubFocus = document.activeElement;
-    lb.classList.add('is-open'); document.body.classList.add('no-scroll'); setInert(true, lb);
-    lb.querySelector('.pub-lb-close').focus({ preventScroll: true });
-  }
-  function pubStep(d) {
-    var list = events(); if (list.length < 2) return;
-    pubIdx = ((pubIdx < 0 ? 0 : pubIdx) + d + list.length) % list.length;
-    var e = list[pubIdx]; renderPub(e.title, e.tag, e.desc, e.img);
+    if (!lb) buildLightbox();
+    var list = getEvents();
+    var k = -1;
+    for (var i = 0; i < list.length; i++) { if (list[i].title === title && list[i].img === img) { k = i; break; } }
+    lbIndex = k < 0 ? 0 : k;
+    showPub(k < 0 ? { title: title, tag: tag, desc: desc, img: img } : list[k]);
+    if (!lb.classList.contains('is-open')) lbFocus = (ev && ev.currentTarget && ev.currentTarget.focus) ? ev.currentTarget : document.activeElement;
+    lb.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    setInert(true);
+    $('.lightbox__close', lb).focus();
   }
   function closePub() {
-    if (!lb || !lb.classList.contains('is-open')) return;
-    lb.classList.remove('is-open'); setInert(false);
-    if (!(modal && modal.classList.contains('is-open'))) document.body.classList.remove('no-scroll'); else setInert(true, modal);
-    if (pubFocus && pubFocus.focus) pubFocus.focus({ preventScroll: true });
+    lb.classList.remove('is-open'); document.body.style.overflow = '';
+    setInert(false);
+    if (lbFocus && lbFocus.focus) lbFocus.focus();
   }
 
-  document.addEventListener('keydown', function (e) {
-    if (lb && lb.classList.contains('is-open')) {
-      if (e.key === 'Escape') closePub();
-      else if (e.key === 'Tab') trapTab(e, lb);
-      else if (e.key === 'ArrowLeft') pubStep(-1);
-      else if (e.key === 'ArrowRight') pubStep(1);
-    } else if (modal && modal.classList.contains('is-open')) {
-      if (e.key === 'Escape') closeStore();
-      else if (e.key === 'Tab') trapTab(e, modal.querySelector('.modal-box'));
-      else if (e.key === 'ArrowLeft') showGal(gal.i - 1);
-      else if (e.key === 'ArrowRight') showGal(gal.i + 1);
-    }
-  });
+  /* Tarjetas de eventos (marcado del contrato sin href): accesibles con teclado */
+  function initPubCards() {
+    $$('.e-card').forEach(function (c) {
+      if (c.hasAttribute('href')) return;
+      c.setAttribute('tabindex', '0'); c.setAttribute('role', 'button');
+      c.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); }
+      });
+    });
+  }
 
-  /* ---------- API global ---------- */
+  /* Pestañas (directorio y niveles del mapa): roles ARIA y flechas */
+  function initTabsA11y() {
+    $$('.tabs').forEach(function (box) {
+      var tabs = $$('.tab', box);
+      if (!tabs.length) return;
+      box.setAttribute('role', 'tablist');
+      tabs.forEach(function (t) {
+        t.setAttribute('role', 'tab');
+        var lv = t.getAttribute('data-level');
+        if (lv) {
+          var f = $('.map-floor[data-level="' + lv + '"]');
+          if (f) { if (!f.id) f.id = 'nivel-' + lv; f.setAttribute('role', 'tabpanel'); t.setAttribute('aria-controls', f.id); }
+          if (!t.hasAttribute('aria-selected')) t.setAttribute('aria-selected', f && !f.hidden ? 'true' : 'false');
+        } else if ($('#dirGrid')) t.setAttribute('aria-controls', 'dirGrid');
+      });
+      box.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var list = $$('.tab', box), i = list.indexOf(document.activeElement);
+        if (i < 0) return;
+        var n = list[(i + (e.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length];
+        n.focus(); n.click();
+      });
+    });
+  }
+
+  /* ---------- Aparición al hacer scroll ---------- */
+  function initReveal() {
+    var els = $$('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('is-in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (e) { io.observe(e); });
+  }
+
+  /* API pública */
   window.norm = norm;
-  window.esc = esc;
   window.GIRO_FAMILIA = GIRO_FAMILIA;
-  window.FAMILIAS = FAMILIAS;
-  window.familiaDe = familiaDe;
+  window.familiaDe = familia;
   window.familiaTienda = familiaTienda;
-  window.famClass = famClass;
-  window.findStore = findStore;
-  window.openStore = openStore;
-  window.closeStore = closeStore;
   window.openPub = openPub;
-  window.closePub = closePub;
-  window.pubPrev = function () { pubStep(-1); };
-  window.pubNext = function () { pubStep(1); };
-  window.SiteUI = { ICON: ICON, slug: slug, qs: qs, stores: stores, events: events, logoHTML: logoHTML, cardHTML: cardHTML, telDigits: telDigits };
+  window.openStore = function (s) { openStore(typeof s === 'string' ? findStore(s) : s); };
 
-  function init() { initHeader(); initDirectory(); initFeatured();}
+  function init() { initMenu(); initCount(); initDirectory(); initFeatured(); initMap(); initTabsA11y(); initPubCards(); initReveal(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
