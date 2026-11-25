@@ -1,8 +1,12 @@
-/* Directorio — complementos de la página (tokens de site.css) */
-.dir-section { padding-top: 0; }
-.dir-grid { margin-bottom: var(--s4); }
-@media (max-width: 767px) {
-  /* Pestañas en dos líneas: las cinco familias siempre a la vista */
-  #dirTabs { flex-wrap: wrap; column-gap: 22px; overflow: visible; }
-  #dirTabs .tab { padding: 14px 0; }
+/* Directorio — Plaza Altabrisa Mérida */
+.dir-section { padding-top: clamp(32px, 5vw, 64px); }
+
+/* Logo de tarjeta en caja 4:3 fija (con o sin logo, todas iguales) */
+#dirGrid .store-logo { min-height: 0; overflow: hidden; }
+
+/* Galería del modal: las fotos de las tiendas son 16:9; se ven enteras, sin recorte */
+.modal .gal-main { aspect-ratio: 16 / 9; }
+.modal .gal-main > img { object-fit: contain; }
+@media (min-width: 761px) {
+  .modal .gal { justify-content: center; }
 }

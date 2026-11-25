@@ -72,13 +72,13 @@
   function restore() { hideTip(); mark(searchHits); }
 
   function addDirLink(s) {
-    var box = document.getElementById('mInfo');
+    var box = document.querySelector('#storeModal .modal-actions') || document.querySelector('#storeModal .modal-info');
     var modal = document.getElementById('storeModal');
     if (!box || !modal || !modal.classList.contains('is-open') || box.querySelector('.map-dirlink')) return;
     var a = document.createElement('a');
-    a.className = 'link-line map-dirlink';
+    a.className = 'link-arrow map-dirlink';
     a.href = 'directorio.html?tienda=' + encodeURIComponent(s.name);
-    a.textContent = 'Ver en el directorio';
+    a.innerHTML = 'Ver en el directorio' + (window.SiteUI && window.SiteUI.ICON ? window.SiteUI.ICON.right : '');
     box.appendChild(a);
   }
 
@@ -90,7 +90,7 @@
     el.addEventListener('click', function () {
       var s = storeOf(el.getAttribute('data-floor'), el.getAttribute('data-local'));
       hideTip();
-      if (s) addDirLink(s); // el modal ya lo abrió site.js
+      if (s && s.cat !== undefined && window.openStore && window.openStore(s)) addDirLink(s);
     });
   });
 
