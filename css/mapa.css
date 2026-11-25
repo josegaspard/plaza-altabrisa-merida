@@ -1,79 +1,99 @@
-/* Mapa — Plaza Altabrisa Mérida */
-.map-section { padding-top: clamp(32px, 5vw, 64px); }
-.fam-libre { --fam: var(--linea); }
-
-.map-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4) var(--s-6); margin-bottom: var(--s-5); }
-.map-bar .tab { min-height: 44px; }
-.map-bar .legend { color: var(--texto); }
-.map-bar .legend .fam-libre i { background: color-mix(in srgb, var(--gris) 22%, var(--fondo)); }
-
-.map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--s-5); align-items: start; }
-.map-card { position: relative; min-width: 0; border: 1px solid var(--linea); border-radius: var(--r-l); background: var(--fondo); padding: clamp(8px, 1.6vw, 20px); }
-.map-floor[hidden] { display: none; }
-.map-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-.m-svg { width: 100%; height: auto; max-width: none; }
-.map-hint { display: none; margin: var(--s-2) 0 0; font-size: var(--fs-xs); color: var(--gris); }
-
-/* Plano redibujado: colores por token */
-.m-base .m-block { fill: var(--fondo-2); }
-.m-base .m-line { fill: none; stroke: var(--linea); stroke-width: 1; }
+/* Mapa general — complementa css/site.css */
+/* Mapa — familias en tonos del azul del logo; el amarillo solo como contorno del local señalado */
+:root {
+  --fam-compras: color-mix(in srgb, var(--ink) 14%, var(--paper));
+  --fam-gastronomia: color-mix(in srgb, var(--ink) 30%, var(--paper));
+  --fam-entretenimiento: color-mix(in srgb, var(--ink) 46%, var(--paper));
+  --fam-servicios: color-mix(in srgb, var(--grey-text) 26%, var(--paper));
+  --fam-vacio: var(--paper);
+  --fam-compras-side: var(--fam-compras); --fam-gastronomia-side: var(--fam-gastronomia);
+  --fam-entretenimiento-side: var(--fam-entretenimiento); --fam-servicios-side: var(--fam-servicios); --fam-vacio-side: var(--paper);
+}
+.m-base .m-block { fill: var(--mist); }
+.m-base .m-line { fill: none; stroke: var(--line-strong); stroke-width: 1; }
 .m-top { pointer-events: none; }
-.m-top .m-num { fill: var(--tinta); }
-.m-top .m-guide { fill: none; stroke: var(--gris); stroke-width: 1.2; }
-.m-top polyline.m-guide { fill: var(--gris); stroke: none; }
-.m-top .m-ico-bg { fill: var(--azul-100); }
-.m-top .m-ico { fill: var(--azul); }
-.m-top .m-ico-w { fill: var(--fondo); }
-.m-top .m-acc { fill: var(--gris); }
-
-.m-local { cursor: pointer; outline: none; }
-.m-local .m-face { fill: color-mix(in srgb, var(--fam) 26%, var(--fondo)); stroke: var(--fondo); stroke-width: 1.6; transition: fill .15s var(--ease); }
-.m-local.is-free .m-face { fill: color-mix(in srgb, var(--gris) 12%, var(--fondo)); }
-.m-local:hover .m-face, .m-local.is-hit .m-face { fill: color-mix(in srgb, var(--fam) 55%, var(--fondo)); }
-.m-local.is-free:hover .m-face, .m-local.is-free.is-hit .m-face { fill: color-mix(in srgb, var(--gris) 28%, var(--fondo)); }
-.m-local.is-free.is-sel .m-face { fill: color-mix(in srgb, var(--gris) 34%, var(--fondo)); }
-.m-local.is-sel .m-face { fill: color-mix(in srgb, var(--fam) 62%, var(--fondo)); stroke: var(--tinta); stroke-width: 2.4; }
-.m-local:focus-visible .m-face { stroke: var(--sol); stroke-width: 4; }
-
-/* Ficha lateral */
-.map-info { position: sticky; top: calc(var(--hdr) + 16px); border: 1px solid var(--linea); border-radius: var(--r-l); background: var(--fondo); padding: var(--s-5); box-shadow: var(--sh-1); }
-.mi-head { display: flex; flex-direction: column; gap: var(--s-4); }
-.mi-logo { width: 96px; height: 72px; border-radius: var(--r-m); border: 1px solid var(--linea); background: var(--fondo); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
-.mi-logo[hidden] { display: none; }
-.mi-logo img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
-.mi-kicker { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 var(--s-2); font-size: var(--fs-xs); font-weight: 700; color: var(--gris); letter-spacing: .02em; }
-.mi-kicker.is-fam { color: var(--tinta); }
-.mi-kicker.is-fam::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--fam); }
-.mi-name { font-size: var(--fs-h3); overflow-wrap: anywhere; }
-.mi-meta { margin: var(--s-2) 0 0; font-size: var(--fs-s); color: var(--texto); }
-.mi-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4); margin-top: var(--s-5); }
-.mi-actions[hidden] { display: none; }
-
-/* Listado de locales */
-.map-list-section .section-head { margin-bottom: var(--s-5); }
-.map-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--s-2); }
-.map-list[hidden] { display: none; }
-.map-list li { display: flex; }
-.ml-item { width: 100%; height: 100%; min-height: 44px; display: flex; align-items: center; gap: var(--s-3); padding: 8px 12px; text-align: left; border: 1px solid var(--linea); border-radius: var(--r-s); background: var(--fondo); transition: border-color .15s var(--ease); }
-.ml-item:hover, .ml-item.is-sel { border-color: var(--azul); }
-.ml-num { flex: none; min-width: 40px; padding: 2px 6px; border-radius: 6px; text-align: center; font-size: var(--fs-xs); font-weight: 700; color: var(--tinta); background: color-mix(in srgb, var(--fam) 26%, var(--fondo)); }
-.ml-item.is-free .ml-num { background: var(--fondo-2); color: var(--texto); }
-.ml-name { font-size: var(--fs-s); font-weight: 600; color: var(--tinta); overflow-wrap: anywhere; }
-.ml-item.is-free .ml-name { font-weight: 500; color: var(--gris); }
-
-@media (max-width: 959px) {
-  .map-layout { grid-template-columns: 1fr; }
-  .map-info { position: static; order: -1; padding: var(--s-4); box-shadow: none; }
-  .mi-head { flex-direction: row; align-items: center; }
-  .mi-logo { width: 72px; height: 56px; }
-  .mi-actions { margin-top: var(--s-3); }
+.m-top .m-num { fill: var(--ink-soft); font-weight: 500; }
+.m-top .m-guide { fill: none; stroke: var(--grey-text); stroke-width: 1.2; }
+.m-top polyline.m-guide { fill: var(--grey-text); stroke: none; }
+.m-top .m-ico-bg { fill: color-mix(in srgb, var(--ink) 12%, var(--paper)); }
+.m-top .m-ico { fill: var(--ink); }
+.m-top .m-ico-w { fill: var(--paper); }
+.m-top .m-acc { fill: var(--grey-text); }
+.map-wrap .m-local .m-face { stroke: var(--paper); stroke-width: 1.6; }
+.map-wrap [data-local]:hover :is(path, polygon, rect), .map-wrap [data-local].is-hit :is(path, polygon, rect) {
+  fill: color-mix(in srgb, var(--ink) 40%, var(--paper)) !important; stroke: var(--sol); stroke-width: 3;
 }
-@media (max-width: 760px) {
-  .m-svg { width: 860px; }
-  .map-hint { display: block; }
-  .map-bar { gap: var(--s-3); }
-  .map-bar .legend { gap: var(--s-2) var(--s-4); font-size: var(--fs-xs); }
+.map-wrap .m-local[data-fam="vacio"]:hover :is(path, polygon, rect) { fill: var(--mist) !important; stroke: var(--line-strong); stroke-width: 1.6; }
+
+/* Mapa general (formato Plaza Carso, 25-nov-2026): un solo plano con los dos niveles, sin ficha lateral ni listados */
+.map-section { padding-top: var(--s6); }
+.map-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s3) var(--s5); flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: var(--s2); }
+.map-bar .search { flex: 0 1 320px; }
+.map-found { min-height: 1.5em; margin: var(--s2) 0 0; font-family: var(--f-display); font-weight: 500; font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; color: var(--grey-text); }
+
+/* Leyenda por familia (filtra el plano) */
+.map-legend { display: flex; flex-wrap: wrap; gap: 4px var(--s4); }
+.legend-item {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
+  font-family: var(--f-display); font-weight: 500; font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; color: var(--grey-text);
+  transition: color .2s;
 }
-@media (max-width: 480px) {
-  .map-list { grid-template-columns: 1fr; }
+button.legend-item:hover, .legend-item[aria-pressed="true"] { color: var(--ink); }
+.legend-item[aria-pressed="true"] .legend-item__name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+.legend-swatch { width: 14px; height: 14px; flex: none; border: 1px solid var(--line-strong); background: var(--sw); }
+.legend-item__n { color: var(--grey-text); font-weight: 400; letter-spacing: .04em; }
+
+/* Plano: los niveles uno debajo del otro dentro del mismo marco */
+.map-wrap { position: relative; margin-top: var(--s4); padding: clamp(12px, 3vw, 40px); border: 1px solid var(--line); background: var(--paper); }
+.map-floor { margin: 0; }
+.map-floor + .map-floor { margin-top: var(--s6); padding-top: var(--s5); border-top: 1px solid var(--line); }
+.map-floor__name { display: block; margin-bottom: var(--s3); font-family: var(--f-display); font-weight: 500; font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; color: var(--grey-text); }
+.map-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.map-wrap .m-svg { width: 100%; max-width: 1100px; height: auto; display: block; margin: 0 auto; }
+
+.m-edge { fill: var(--line); }
+.m-floor { fill: var(--mist); }
+.m-void { fill: var(--line); }
+.m-lbl { fill: var(--grey-text); font-family: var(--f-body); font-size: 13px; pointer-events: none; }
+.m-local { outline: none; transition: opacity .25s; }
+.m-local .m-face { stroke: var(--paper); stroke-width: 1; vector-effect: non-scaling-stroke; transition: fill .2s; }
+.m-num { font-family: var(--f-body); font-size: 15px; font-weight: 500; letter-spacing: -.02em; pointer-events: none; fill: var(--paper); transition: fill .2s; }
+
+.m-local[data-fam="compras"] .m-face { fill: var(--fam-compras); }
+.m-local[data-fam="compras"] .m-side { fill: var(--fam-compras-side); }
+.m-local[data-fam="gastronomia"] .m-face { fill: var(--fam-gastronomia); }
+.m-local[data-fam="gastronomia"] .m-side { fill: var(--fam-gastronomia-side); }
+.m-local[data-fam="entretenimiento"] .m-face { fill: var(--fam-entretenimiento); }
+.m-local[data-fam="entretenimiento"] .m-side { fill: var(--fam-entretenimiento-side); }
+.m-local[data-fam="servicios"] .m-face { fill: var(--fam-servicios); }
+.m-local[data-fam="servicios"] .m-side { fill: var(--fam-servicios-side); }
+.m-local[data-fam="vacio"] .m-face { fill: var(--fam-vacio); stroke: var(--line-strong); }
+.m-local[data-fam="vacio"] .m-side { fill: var(--fam-vacio-side); }
+.m-local[data-fam="vacio"] { cursor: default; }
+
+/* Resalte al señalar o buscar: el resto se apaga; la leyenda filtra por familia */
+.map-wrap.has-hit .m-local:not(.is-hit) { opacity: .25; }
+.map-wrap[data-filter] .m-local { opacity: .18; }
+.map-wrap[data-filter="compras"] .m-local[data-fam="compras"],
+.map-wrap[data-filter="gastronomia"] .m-local[data-fam="gastronomia"],
+.map-wrap[data-filter="entretenimiento"] .m-local[data-fam="entretenimiento"],
+.map-wrap[data-filter="servicios"] .m-local[data-fam="servicios"],
+.map-wrap.has-hit .m-local.is-hit { opacity: 1; }
+
+/* Etiqueta flotante (nombre + local) */
+.map-tip {
+  position: absolute; z-index: 5; transform: translate(-50%, calc(-100% - 10px)); pointer-events: none;
+  display: grid; gap: 2px; padding: 9px 14px; background: var(--paper); border: 1px solid var(--line-strong); white-space: nowrap; text-align: center;
+}
+.map-tip[hidden] { display: none; }
+.map-tip strong { font-family: var(--f-display); font-weight: 500; font-size: var(--fs-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.map-tip span { font-size: .78rem; color: var(--grey-text); }
+
+/* Enlace al directorio dentro del modal de tienda */
+.modal .map-dirlink { margin-top: var(--s4); }
+
+@media (max-width: 759px) {
+  .map-scroll .m-svg { width: 760px; max-width: none; }
+  .map-bar { align-items: stretch; }
+  .map-bar .search { flex: 1 1 100%; }
 }

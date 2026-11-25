@@ -13,7 +13,7 @@
     form.addEventListener('submit', function (e) {
       if (!esDemo) { if (btn) btn.disabled = true; return; }
       e.preventDefault();
-      if (msg) { msg.className = 'form-msg ok'; msg.textContent = texto; }
+      if (msg) msg.textContent = texto;
       form.reset();
     });
   }

@@ -1,56 +1,90 @@
-# Diseño — Plaza Altabrisa Mérida
+# Plaza Altabrisa Mérida — guía de diseño
 
-Identidad: «Luz de Yucatán». Blanco limpio y fotografía grande de la plaza; el azul profundo manda (titulares, texto, pie); amarillo y rosa del logo solo como acentos pequeños (un botón, trazos de 2-3 px, el subrayado del menú). Sin bloques ni formas decorativas grandes. El único bloque de color es el panel «Cómo llegar» de la portada (azul del logo, texto blanco, filete y botón amarillos) y el pie en azul profundo.
+**Desde el 25-nov-2026 Mérida usa EXACTAMENTE el sistema de Villahermosa (abajo).** Pedido de Inmuebles Carso: «que todas
+queden como Villahermosa, solo cambiando el color de identidad». Diferencias propias de Mérida (bloque final de css/site.css):
+- `--ink` = azul del logo #274fa6 (en Villahermosa es negro). El amarillo del logo (`--sol`) SOLO en contornos finos:
+  subrayado del menú y de las pestañas, remate del pie, contorno del local señalado en el mapa. Nunca botones ni etiquetas amarillas.
+- Prohibido en Mérida (pedido explícito): rótulos «Mérida, Yucatán» y «La plaza», flechas, etiquetas amarillas, botones del hero
+  («Ver directorio», «Cómo llegar»), la palabra «Galería» (hay un centro comercial «Galerías»: usar «Fotos»), la sección de
+  marcas destacadas, migas «Inicio / Directorio» y el contador «153 tiendas».
+- Mapa: un solo plano general con los dos niveles (formato Plaza Carso), sin foto aérea, sin ficha lateral ni instrucciones.
+- Fotos: aclaradas una vez con tools/aclaradas.txt como registro (no volver a aclarar lo que ya está ahí).
 
-## Fuentes (Google Fonts, ya en el HEAD de `_shell.html`)
-- Titulares: **Red Hat Display** 400–600 (`--ff-titulo`). Texto: **Red Hat Text** 400–600 (`--ff-texto`). Ninguna otra.
+---
 
-## Tokens (`css/site.css`, `:root`)
-- Logo: `--azul #274fa6` (principal), `--azul-900` (pie), `--sol #f8b800`, `--sol-2 #f8c000`, `--ocre #986018` (sombra de botón), `--rosa #dd3e9c`.
-- Tintes claros: `--azul-50`, `--azul-100`, `--sol-50`, `--rosa-50` (fondos de iconos y etiquetas).
-- Rosa del logo: acento fijo y discreto (subrayado del enlace activo del menú, iconos de lugar); nunca en fondos grandes.
-- Titulares (h1–h4, `.hero-title`, `.page-title`) en `--azul-700`: azul que se lee azul, no casi negro.
-- Neutros: `--tinta`, `--texto`, `--gris #5a6680` (contraste AA sobre blanco: contadores, nombres de marca), `--linea`, `--fondo #fff`, `--fondo-2` (azul muy claro, NUNCA crema).
-- Familias: `--f-compras` azul · `--f-gastronomia` sol · `--f-entretenimiento` rosa · `--f-servicios` ocre. Clases `.fam-compras` etc. definen `--fam`.
-- Radios `--r-s 8` · `--r-m 12` (fotos del hero y de Accesos, panel «Cómo llegar») · `--r-l 14` (nunca píldora). Sombras `--sh-1`, `--sh-2`, `--sh-btn`.
-- Medidas `--gutter`, `--section`, `--maxw 1240`, `--hdr` (alto de cabecera; el body ya lo compensa).
+## Sistema común (base Villahermosa)
+
+Concepto: «Luxury Fashion Mall» como galería boutique. Interfaz en blanco puro + negro del logo, gris del logo
+solo para filetes y rótulos. Líneas de 1 px, esquinas rectas (radio 0), mucho aire, fotos A TODO COLOR con marco
+fino interior (passe-partout), rejillas asimétricas y apariciones suaves al hacer scroll. Una sola banda negra (datos bajo
+el hero) da el ritmo; el resto de la página es blanco y gris niebla. Las fotos del edificio llevan una gradación cálida
+(`--photo`) que calma los magentas y azules de las luces nocturnas sin quitarles color. Manda también CONTRATO-DISENO.md (enchufes data-cc, STORES, EVENTS…).
+
+## Fuentes (Google Fonts, ya enlazadas en `_shell.html`)
+- **Jost** 200/300/400/500 → titulares grandes en 200 (`.hero__title`, `.h-section`, `.page-hero__title`), títulos medianos
+  en 300, rótulos en mayúsculas (500, tracking `--track`), botones.
+- **Hanken Grotesk** 400/500/600 → texto corrido, formularios, pie.
+
+## Tokens (`:root` en css/site.css) — no escribir colores ni tamaños sueltos
+`--ink #000` · `--ink-2` · `--grey #adadac` (logo; filetes y texto sobre negro) · `--grey-text #6b6b6a` (texto
+secundario sobre blanco) · `--line` · `--line-dark` · `--paper #fff` · `--mist #f4f4f4` (bandas) · `--ink-soft` (texto largo sobre blanco) ·
+`--paper-soft` (texto sobre negro) · `--overlay` / `--overlay-strong` (fondos de modal y lightbox) ·
+`--photo` (gradación cálida de fotos: `saturate(.7) sepia(.2) contrast(1.05) brightness(.98)`).
+Tamaños: `--fs-xs … --fs-xl`, `--fs-hero` (index), `--fs-page` (páginas internas, enorme). Espacio: `--s1…--s8`,
+`--gutter`, `--maxw`, `--hh` (alto cabecera). `--r: 0`. Prohibido: radios, sombras (el modal lleva filete `--line`), degradados, cursivas.
 
 ## Esqueleto de cada página
-1. `<head>`: PRIMERO `<meta charset>` y `viewport` (las 2 primeras líneas del bloque HEAD de `_shell.html`), luego title, description, canonical, og:* propios y el resto del bloque HEAD tal cual. Las `meta` description/og:description NO llevan `data-cc` (la descripción completa es demasiado larga para una meta).
-2. CABECERA de `_shell.html` tal cual; pon `aria-current="page"` en tu enlace (en `.nav` y en `.mob-panel`).
-3. `<main id="main">` empezando por el hero interno:
+1. `<head>` y cabecera/pie: copiar TAL CUAL de `_shell.html`; mover `aria-current="page"` al enlace propio.
+2. `<main>` (ya trae padding-top de la cabecera fija) → primer bloque = hero interno:
 ```html
-<section class="page-hero"><div class="page-hero-box"><div class="container">
-  <p class="page-crumb"><a href="index.html">Inicio</a> / Directorio</p>
-  <h1 class="page-title">Directorio</h1>
-  <p class="page-lead">(opcional, solo texto funcional o de la fuente)</p>
-</div></div></section>
+<section class="page-hero"><div class="wrap"><span class="kicker" data-cc="nombre">Plaza Altabrisa Tabasco</span>
+<h1 class="page-hero__title">Directorio</h1></div><div class="page-hero__media"></div></section>
 ```
-4. Secciones: `<section class="section">` (+ `.section-alt` para fondo azul claro) con `.container`. Encabezado: `.section-head` > `p.kicker` (opcional) + `h2.h2`. Kicker y h2 = rotulación funcional (Accesos, Cómo llegar, Directorio…), nada de frases de marketing («Explora», «Visítanos»). Un kicker nunca es el único título: si no hay h2 visible, `h2.sr-only` + `p.kicker aria-hidden`. Sin padding inferior: `.section.section-tight`.
-5. PIE de `_shell.html` tal cual, luego `<script>const STORES = [...];</script>` (una línea) y `<script src="Scripts/site.js" defer></script>`.
+   La foto de `.page-hero__media` va en un `<style>` del propio HTML (`.page-hero__media{background-image:url(images/...)}`).
+   Usar `images/home/slot-2.jpg` (directorio), `slot-3.jpg` (mapa), `slot-4.jpg` (eventos), `slot-1.jpg` (contacto).
+3. Secciones: `<section class="section">` (+ `section--mist` / `section--dark`) con `<div class="wrap">`.
+   Encabezado de sección: `h2.h-section` solo, o `.kicker` + `h2.h-section` cuando el rótulo aporte (el kicker ya no lleva
+   rayita delante; no repetir el mismo texto en kicker y título). Banda negra de datos: `section.section--dark.band`. Animación opcional: clase `reveal`.
+4. Al final: datos en línea (`const STORES/EVENTS/LOCAL_STORE`, una línea cada uno) y luego
+   `<script src="Scripts/site.js" defer></script>`. No añadir otras librerías.
 
 ## Componentes y clases
-- Botones: `.btn` + `.btn-sol` (acción principal) / `.btn-azul` / `.btn-line` / `.btn-blanco` (sobre azul). Enlace con flecha: `.link-arrow`.
-- Directorio (lo pinta `site.js` solo): `<div class="dir-bar"><div class="tabs" id="dirTabs"></div><label class="search"><span class="sr-only">Buscar tienda</span><input id="dirSearch" type="search" placeholder="Buscar tienda" autocomplete="off"></label></div><p class="dir-count" id="dirCount"></p><div class="store-grid" id="dirGrid"></div>`. Pestañas, contador, tarjetas, modal y `?cat=` / `?tienda=` funcionan sin más código.
-- Modal de tienda: `openStore(nombre)` / `closeStore()` (lo crea el JS). `findStore()`, `familiaDe(giro)`, `famClass()`, `norm()` y `GIRO_FAMILIA` son globales.
-- Mapa: reutiliza `.tabs/.tab` para niveles, `.legend` con `<span class="fam-compras"><i></i>Compras</span>`, colores `var(--f-…)`; clic en local → `openStore(nombre)` o `directorio.html?tienda=`.
-- Eventos: marcado EXACTO del contrato (`.pub-section`, `.pub-h2`, `.pub-grid`, `.e-card`…); `openPub()` y el lightbox con flechas ya están en `site.js` (recorren `const EVENTS`). Sin publicaciones: `<div class="pub-empty"><p>…</p></div>` dentro de `.pub-grid`.
-- Formulario: `.form-card` > `.form-grid` > `.field` (input/textarea con placeholder + aria-label), `.form-row` (2 columnas), `.check`, `.form-msg.ok/.err`. Renta de locales: `.rent-card` (solo borde).
-- Datos con iconos: `.fact` (ver index) o `.visit-row`. Redes: `.social`.
-- Hero interno con foto: `.page-hero-box.has-media` > `.container` > `.page-hero-text` + `.page-hero-media` (una imagen `images/home/slot-N.jpg` con `<img>` en el HTML). Foto sin velos ni degradados encima.
-- Accesibilidad: zonas de toque ≥ 44 px (enlaces sueltos con `display:inline-flex; min-height:44px`). Modal, lightbox y menú móvil ya atrapan el foco y ponen `inert` al fondo (site.js). Pestañas del directorio = botones con `aria-pressed` (no `role=tab`).
-- La clase `.rv` ya no oculta nada (se quitó la aparición al hacer scroll: dejaba secciones invisibles sin JS o en capturas de página entera). Puede quedarse en el HTML sin efecto.
-- Marcas (portada `.brand-grid` y directorio `.store-grid`): misma rejilla de filetes finos, sin cajas, sombras ni puntos de color; nombre centrado en 13 px con interletra .04em. La familia solo se ve como texto (chip del modal) y en el mapa.
-- Portada: foto del hero alineada al contenedor (1240 px) con radio 12; datos de «La plaza» a 18 px; en ≤480 px los botones del hero van apilados a ancho completo (48 px).
-- Accesos: toda la tarjeta es el enlace; la foto hace zoom 1.03 al pasar el ratón; rótulo 19 px peso medio; flecha de 44 px.
-- Chip de familia: `<span class="chip fam-gastronomia">Gastronomía</span>`.
+- Botones: `.btn` (negro) · `.btn--ghost` (contorno) · `.btn--light` (sobre negro) · enlace `.link-line`.
+- Directorio: `.dir-bar > .wrap > #dirTabs.tabs` + `label.search > svg + input#dirSearch`; debajo
+  `.wrap > p#dirCount.dir-count + #dirGrid.dir-grid + p#dirEmpty.dir-empty[hidden]`. Las pestañas, tarjetas
+  (`.store-card`, solo logo), contador, buscador sin acentos, modal con galería y deep links `?cat=` / `?tienda=`
+  los pinta site.js desde `STORES`. No escribir tarjetas a mano ni filtros extra.
+- Familias: `GIRO_FAMILIA` en site.js (giro normalizado → Compras/Gastronomía/Entretenimiento/Servicios;
+  desconocido → Compras). Si aparece un giro nuevo, añadirlo ahí, no en la página.
+- Mapa: pestañas `.tabs > button.tab[data-level="pb"]` + planos `.map-wrap > .map-floor[data-level="pb"]` (los demás
+  con `hidden`); site.js alterna niveles. Locales `<g data-floor data-local>`: site.js los conecta a `LOCAL_STORE` y abre el modal de tienda.
+- Eventos y promociones: marcado EXACTO del contrato (`.pub-section/.pub-h2/.pub-grid/.e-card`). El cartel se ve
+  entero; `.e-card-overlay` está oculto y `.e-card-body` va debajo. `openPub()` y el lightbox con flechas están en
+  site.js. Sin publicaciones: `<p class="pub-empty">` con rotulación funcional, sin inventar.
+- Contacto: `.contact-grid` (2 columnas), campos `.field` (sin etiqueta visible: placeholder + aria-label),
+  casilla `label.check > input + span`, `.btn` para enviar, `.rent-card` para renta de locales, `iframe.map-embed`.
+- Redes: `.social` (cuadros de 44 px con borde). Modal/lightbox: los crea site.js, no maquetarlos.
 
 ## Reglas
-- CSS propio en `css/<pagina>.css`, JS propio en `Scripts/<pagina>.js`. `site.css`, `site.js` y `_shell.html` son comunes: cualquier cambio vale para las 5 páginas y el 404.
-- Solo colores por token; nada de hex nuevos ni gradientes (solo la máscara de fundido de las pestañas del directorio en móvil). Radios 8–16. Nada de `style="…"` en el HTML ni en el JS: clase en el CSS.
-- Títulos del pie: `h2` (estilo de rótulo); el CSS acepta h3 por compatibilidad.
-- Prohibido: cursivas en titulares, rótulos numerados «01/02», monospace, botones píldora, comillas decorativas, © o año en el pie, filtros extra en el directorio, texto inventado (copy = cc.json / web viva o rotulación funcional).
-- Marcas `data-cc` del contrato donde aparezcan datos de la plaza. Teléfono: `<a data-cc="telefono" href="tel:9991679719">999 167 9719</a>` (Mérida tiene un solo teléfono; `telefono2` va vacío en el pie y se oculta solo).
-- Imágenes: no hay originales de más de 1600×900 (carrusel vivo) ni logo de más de 250 px; no se suben de resolución. El hero y las cajas de página interna se limitan a 1600 px de ancho. Logo a 60 px (48 en móvil). Logos de tiendas en `images/locatarios/<idCatLocatario>.<ext>`.
-- Imágenes `.jpg/.webp` optimizadas, `loading="lazy"` fuera del primer pantallazo, `width/height` puestos. Rutas siempre relativas.
-- Probar a 320, 390, 768, 1440 y 1920: sin scroll horizontal y 0 errores de consola.
+- Título interno SIEMPRE `.page-hero__title` (mayúsculas, `--fs-page`); nunca el tamaño del index.
+- Nada de texto inventado: copy de data/tabasco/cc.json o rotulación funcional. Sin horario si la fuente no lo da.
+- Sin «01/02», sin monospace, sin píldoras, sin comillas decorativas, sin © ni año en el pie.
+- Imágenes .jpg/.webp optimizadas, `loading="lazy"` fuera del primer pantallazo, `alt` real. Rutas relativas.
+- Probar a 390/768/1440: 0 errores de consola, sin scroll horizontal. Zonas de toque ≥ 44 px (ya resueltas en el CSS común).
+- Fotos SIEMPRE a todo color: jamás `grayscale`. El único filtro permitido es `filter: var(--photo)`, y solo en fotos de la
+  plaza (`.hero__media img`, `.access__img img`, `.page-hero__media`). Nunca en `.firma img` (fotos de tiendas), logos,
+  carteles ni mapas. Marco fino interior con `::after` (`--frame-light`).
+- Portada: hero con el rótulo arriba y título + lema + botones anclados abajo; banda `.facts-strip` negra (rótulos `--grey`,
+  filetes `rgba(255,255,255,.15)`); «Explora» = 2 fotos + panorámica a todo el ancho (21/8); «Firmas» = 1 foto grande + 2×2
+  (la 6ª tarjeta no se muestra; en móvil 1 grande + 2×2 sin huecos). Encuadre por tienda con `.firma[data-tienda="<slug>"] img`.
+- Logos (`.store-card`, Marcas y directorio): `max-width: 70%; max-height: 46%` para que todos pesen parecido. Si un logo del
+  gestor trae un lienzo con márgenes enormes, recortar el margen del archivo (mismo nombre).
+- Apariciones: la cortina (`clip-path`) va siempre en un hijo (`.access__img`, `.firma img`), nunca en el elemento `.reveal`
+  observado: el observador de scroll no detecta un elemento recortado a cero y la foto se quedaría invisible.
+- El lema «Luxury Fashion Mall» solo va en el logo y en `.hero__lema` del index: no repetirlo en pie, rótulos ni textos verticales.
+  El pie termina en un filete vacío (`<div class="footer-bottom" aria-hidden="true"></div>`, ya en `_shell.html`).
+- `data-cc="nombre"` lo sustituye el motor por el nombre del gestor («Altabrisa Tabasco», sin «Plaza»): usarlo solo en rótulos
+  pequeños (kicker, título del pie), nunca en un H1 que deba coincidir con el logo.
+- STORES con el esquema del contrato (`cat/num/loc/desc/fb/ig/imgs`), no con los campos de `data/tabasco/stores.json`
+  (`giro/local/piso/descripcion/facebook/instagram/fotos`). Logos copiados a `images/locatarios/<id>.<ext>` (ya están).
+- Pestañas, modal, lightbox, menú y `.e-card` sin href: la accesibilidad (roles, flechas, `inert`, foco) la pone site.js.
